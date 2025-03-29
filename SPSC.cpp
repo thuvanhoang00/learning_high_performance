@@ -29,6 +29,8 @@ void produce()
 		std::lock_guard<std::mutex> guard(producedAllMtx);
 		producedAll = true;
 	}
+	// have to notify here
+	c_cv.notify_all();
 }
 
 void consume()
@@ -37,14 +39,26 @@ void consume()
 	while(true){
 		std::unique_lock<std::mutex> lk(mtx);
 		c_cv.wait(lk, [&](){return !q.empty() || producedAll;});
-		int val = q.front();
-		q.pop();
-		std::cout << "Consume: " << val << std::endl;
-		// lk.unlock(); // Why crash here?
-		lk.unlock();
-		p_cv.notify_all();
-		
-		if(producedAll) break;
+		#if 0
+		if(!q.empty()){
+			int val = q.front();
+			q.pop();
+			std::cout << "Consume: " << val << std::endl;
+			// lk.unlock(); // Why crash here?
+			lk.unlock();
+			p_cv.notify_all();
+		}
+		else if(producedAll) break;
+		#endif
+		// // If use this version, pop can cause crash
+		// 	int val = q.front();
+		// 	q.pop();
+		// 	std::cout << "Consume: " << val << std::endl;
+		// 	// lk.unlock(); // Why crash here?
+		// 	lk.unlock();
+		// 	p_cv.notify_all();
+
+		// if(producedAll) break;
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 }
