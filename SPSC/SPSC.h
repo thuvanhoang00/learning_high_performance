@@ -6,6 +6,30 @@
 #include <queue>
 #include <vector>
 #include <condition_variable>
+#include <atomic>
+#include <time.h>
+class SpinLock{
+public:
+    SpinLock() : flag_(0){}
+    // ~SpinLock(){unlock();}
+
+    void lock(){
+        static const timespec ns = {0, 1};
+        for(int i=0; flag_.load(std::memory_order_relaxed) || flag_.exchange(1, std::memory_order_acquire); ++i){
+            if(i==8){
+                i=0;
+                nanosleep(&ns, nullptr);
+            }
+        }
+    }
+
+    void unlock(){
+        flag_.store(0, std::memory_order_release);
+    }
+
+private:
+    std::atomic<unsigned int> flag_;
+};
 
 struct SPSC
 {
@@ -75,6 +99,25 @@ struct SPSC
         }
     }
 
+    void produce_sp(){
+        for(int i=0; i <size; i++){
+            spin.lock();
+            q.push(i);
+            spin.unlock();
+        }
+    }
+    void consume_sp(){
+        while(consume_count<size){
+            spin.lock();
+            if(!q.empty()) {
+                int val = q.front();
+                q.pop();
+                consume_count++;
+            }
+            spin.unlock();
+        }
+    }
+
 private:
     std::condition_variable p_cv;
     std::condition_variable c_cv;
@@ -83,6 +126,7 @@ private:
     std::queue<int> q;
     int size;
     int consume_count=0;
+    SpinLock spin;
 };
 
 #endif
