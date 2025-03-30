@@ -4,6 +4,7 @@
 #include <queue>
 #include <vector>
 #include <condition_variable>
+#include "SPSC.h"
 #define N 100
 std::condition_variable p_cv;
 std::condition_variable c_cv;
@@ -65,8 +66,10 @@ void consume()
 
 int main()
 {
-	std::thread t1(produce);
-	std::thread t2(consume);
+	SPSC spsc(100);
+
+	std::thread t1(&SPSC::produce_mtx, &spsc);
+	std::thread t2(&SPSC::consume_mtx, &spsc);
 	t1.join();
 	t2.join();
 	return 0;

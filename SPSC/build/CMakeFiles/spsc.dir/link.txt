@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/spsc.dir/SPSC_bench.cpp.o -o spsc  /usr/local/lib/libbenchmark.a -lrt 
