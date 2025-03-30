@@ -1,3 +1,0 @@
-/home/thu/workspace/learning_high_performance/SPSC/build/CMakeFiles/spsc.dir
-/home/thu/workspace/learning_high_performance/SPSC/build/CMakeFiles/edit_cache.dir
-/home/thu/workspace/learning_high_performance/SPSC/build/CMakeFiles/rebuild_cache.dir
