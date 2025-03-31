@@ -71,17 +71,12 @@ struct SPSC
     }
 
     void produce_mtx(){
+        // std::cout << "MTX: " << size << std::endl;
         for (int idx = 0; idx < size; idx++)
         {
             std::lock_guard<std::mutex> plk(mtx);
             q.push(idx);
-            // std::cout << "Produce: " << idx << std::endl;
         }
-
-        // {
-        //     std::lock_guard<std::mutex> guard(producedAllMtx);
-        //     producedAll = true;
-        // }
     }
 
     void consume_mtx(){
@@ -92,7 +87,6 @@ struct SPSC
             {
                 int val = q.front();
                 q.pop();
-                // std::cout << "Consume: " << val << std::endl;
                 consume_count++;
             }
             if(consume_count == size) break;
@@ -100,6 +94,7 @@ struct SPSC
     }
 
     void produce_sp(){
+        // std::cout << "SP: " << size << std::endl;
         for(int i=0; i <size; i++){
             spin.lock();
             q.push(i);
@@ -118,6 +113,40 @@ struct SPSC
         }
     }
 
+    /*
+     *   Spinlock version 2
+     *   Using 1 atomic
+     */
+    void produce_sp2(){
+        // std::cout << "SP2: " << size << std::endl;
+        for(int i=0; i <size; i++){
+            // unsigned int expected = 0;
+
+            while(spin2.load(std::memory_order_acquire)==1);
+            spin2.store(1, std::memory_order_release);
+
+            q.push(i);
+
+            spin2.store(0, std::memory_order_release);
+        }
+    }
+    void consume_sp2(){
+        while(true){
+            // unsigned int expected = 0;
+
+            while(spin2.load(std::memory_order_acquire)==1);
+            spin2.store(1, std::memory_order_release);
+            if(!q.empty()) {
+                int val = q.front();
+                q.pop();
+                consume_count++;
+            }
+            if(consume_count == size) break;
+
+            spin2.store(0, std::memory_order_release);
+        }
+    }
+
 private:
     std::condition_variable p_cv;
     std::condition_variable c_cv;
@@ -127,6 +156,12 @@ private:
     int size;
     int consume_count=0;
     SpinLock spin;
+    
+    /*
+    *   Spinlock version 2
+    *   Using 1 atomic
+    */
+   std::atomic<unsigned int> spin2;
 };
 
 #endif
