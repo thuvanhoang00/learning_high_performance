@@ -75,6 +75,6 @@ static void benchmark_SPSC_sp2(benchmark::State& s)
 // BENCHMARK(benchmark_SPSC_cv);
 BENCHMARK(benchmark_SPSC_mtx);
 BENCHMARK(benchmark_SPSC_sp);
-// BENCHMARK(benchmark_SPSC_sp2);
+BENCHMARK(benchmark_SPSC_sp2);
 
 BENCHMARK_MAIN();

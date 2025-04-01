@@ -11,7 +11,6 @@
 class SpinLock{
 public:
     SpinLock() : flag_(0){}
-    // ~SpinLock(){unlock();}
 
     void lock(){
         static const timespec ns = {0, 1};
@@ -118,12 +117,9 @@ struct SPSC
      *   Using 1 atomic
      */
     void produce_sp2(){
-        // std::cout << "SP2: " << size << std::endl;
         for(int i=0; i <size; i++){
-            // unsigned int expected = 0;
-
-            while(spin2.load(std::memory_order_acquire)==1);
-            spin2.store(1, std::memory_order_release);
+            unsigned int expected = 0;
+            while(!spin2.compare_exchange_weak(expected, 1, std::memory_order_acquire) || (expected==1));
 
             q.push(i);
 
@@ -131,17 +127,16 @@ struct SPSC
         }
     }
     void consume_sp2(){
-        while(true){
-            // unsigned int expected = 0;
+        while(consume_count < size){
+            unsigned int expected = 0;
+            while(!spin2.compare_exchange_weak(expected, 1, std::memory_order_acquire) || (expected==1));
 
-            while(spin2.load(std::memory_order_acquire)==1);
-            spin2.store(1, std::memory_order_release);
             if(!q.empty()) {
                 int val = q.front();
                 q.pop();
                 consume_count++;
             }
-            if(consume_count == size) break;
+            // if(consume_count == size) break;
 
             spin2.store(0, std::memory_order_release);
         }
