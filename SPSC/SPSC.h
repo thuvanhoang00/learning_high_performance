@@ -56,7 +56,7 @@ private:
 
 struct SPSC
 {
-    SPSC(int size_) : size (size_){}
+    SPSC(int size_) : size (size_), spin2(0) {}
     void produce_cv(){
         for (int idx = 0; idx < size; idx++)
         {
@@ -145,7 +145,7 @@ struct SPSC
             unsigned int expected = 0;
             while(!spin2.compare_exchange_weak(expected, 1, std::memory_order_acquire)){
                 expected = 0;
-                std::this_thread::sleep_for(std::chrono::nanoseconds(10));
+                // std::this_thread::sleep_for(std::chrono::nanoseconds(10));
             }
 
             q.push(i);
@@ -158,7 +158,7 @@ struct SPSC
             unsigned int expected = 0;
             while(!spin2.compare_exchange_weak(expected, 1, std::memory_order_acquire)){
                 expected = 0;
-                std::this_thread::sleep_for(std::chrono::nanoseconds(10));
+                // std::this_thread::sleep_for(std::chrono::nanoseconds(10));
             }
 
             if(!q.empty()) {
