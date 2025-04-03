@@ -8,6 +8,8 @@
 #include <condition_variable>
 #include <atomic>
 #include <time.h>
+#include <chrono>
+
 class SpinLock{
 public:
     SpinLock() : flag_(0){}
@@ -28,6 +30,28 @@ public:
 
 private:
     std::atomic<unsigned int> flag_;
+};
+
+
+class MySpin{
+public:
+    MySpin() : spin_(0) {}
+
+    void lock(){
+        unsigned int expected{0};
+        do{
+            std::this_thread::sleep_for(std::chrono::nanoseconds(10));
+            expected = 0;
+        }
+        while(!spin_.compare_exchange_weak(expected, 1, std::memory_order_acquire));
+    }
+
+    void unlock(){
+        spin_.store(0, std::memory_order_release);
+    }
+
+private:
+    std::atomic<unsigned int> spin_;
 };
 
 struct SPSC
@@ -119,7 +143,10 @@ struct SPSC
     void produce_sp2(){
         for(int i=0; i <size; i++){
             unsigned int expected = 0;
-            while(!spin2.compare_exchange_weak(expected, 1, std::memory_order_acquire) || (expected==1));
+            while(!spin2.compare_exchange_weak(expected, 1, std::memory_order_acquire)){
+                expected = 0;
+                std::this_thread::sleep_for(std::chrono::nanoseconds(10));
+            }
 
             q.push(i);
 
@@ -129,16 +156,37 @@ struct SPSC
     void consume_sp2(){
         while(consume_count < size){
             unsigned int expected = 0;
-            while(!spin2.compare_exchange_weak(expected, 1, std::memory_order_acquire) || (expected==1));
+            while(!spin2.compare_exchange_weak(expected, 1, std::memory_order_acquire)){
+                expected = 0;
+                std::this_thread::sleep_for(std::chrono::nanoseconds(10));
+            }
 
             if(!q.empty()) {
                 int val = q.front();
                 q.pop();
                 consume_count++;
             }
-            // if(consume_count == size) break;
-
             spin2.store(0, std::memory_order_release);
+        }
+    }
+
+
+    void produce_my_sp(){
+        for(int i=0; i <size; i++){
+            myspin.lock();
+            q.push(i);
+            myspin.unlock();
+        }
+    }
+    void consume_my_sp(){
+        while(consume_count<size){
+            myspin.lock();
+            if(!q.empty()) {
+                int val = q.front();
+                q.pop();
+                consume_count++;
+            }
+            myspin.unlock();
         }
     }
 
@@ -157,6 +205,8 @@ private:
     *   Using 1 atomic
     */
    std::atomic<unsigned int> spin2;
+
+   MySpin myspin;
 };
 
 #endif
