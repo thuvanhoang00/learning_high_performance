@@ -40,7 +40,7 @@ public:
     void lock(){
         unsigned int expected{0};
         do{
-            std::this_thread::sleep_for(std::chrono::nanoseconds(10));
+            std::this_thread::sleep_for(std::chrono::nanoseconds(5));
             expected = 0;
         }
         while(!spin_.compare_exchange_weak(expected, 1, std::memory_order_acquire));

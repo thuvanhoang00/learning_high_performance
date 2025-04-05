@@ -92,7 +92,7 @@ static void benchmark_SPSC_my_sp(benchmark::State& s)
 // BENCHMARK(benchmark_SPSC_cv);
 BENCHMARK(benchmark_SPSC_mtx)->DenseRange(20,25);
 BENCHMARK(benchmark_SPSC_sp)->DenseRange(20,25);
-BENCHMARK(benchmark_SPSC_sp2)->DenseRange(20,25);
+//BENCHMARK(benchmark_SPSC_sp2)->DenseRange(20,25);
 BENCHMARK(benchmark_SPSC_my_sp)->DenseRange(20,25);
 
 
