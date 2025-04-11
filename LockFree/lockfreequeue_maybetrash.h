@@ -74,6 +74,22 @@ public:
         return true;
     }
 
+    bool tryPush(T* data){
+        size_t t = _tail.load(std::memory_order_relaxed);
+        if(_head.load(std::memory_order_acquire) + _capacity == t) return false;
+        _queue[t % _capacity].data = *data;
+        _tail.store(t+1, std::memory_order_release);
+        return true;
+    }
+
+    T* tryPop(){
+        size_t h = _head.load(std::memory_order_relaxed);
+        if(_tail.load(std::memory_order_acquire) == h) return nullptr;
+        T* p = &_queue[h % _capacity].data;
+        _head.store(h+1, std::memory_order_release);
+        return p;
+    }
+
 private:
     struct Node{
         T data;
