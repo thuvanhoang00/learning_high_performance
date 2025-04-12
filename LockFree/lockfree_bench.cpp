@@ -2,6 +2,7 @@
 #include "messagequeue.h"
 #include "fifo1.h"
 #include "fifo2.h"
+#include "fifo3.h"
 #include <benchmark/benchmark.h>
 
 #define SIZE 5000000
@@ -108,7 +109,29 @@ static void fifo2_test(benchmark::State& s)
     }
 }
 
+static void fifo3_test(benchmark::State& s)
+{
+    for(auto state : s){
+        Fifo3<int, std::allocator<int>> ff3(SIZE);
+
+        auto push = [&](){for(int i=0; i<SIZE; i++) ff3.push(i);};
+        auto pop = [&](){
+            for (int i = 0; i < SIZE; i++)
+            {
+                int data;
+                ff3.pop(data);
+            };
+        };
+        std::thread t1(push);
+        std::thread t2(pop);
+        t1.join();
+        t2.join();
+    }
+}
+
 BENCHMARK(fifo2_test);
+BENCHMARK(fifo3_test);
+
 BENCHMARK(lockfree_test);
 BENCHMARK(msgqueue_test);
 
