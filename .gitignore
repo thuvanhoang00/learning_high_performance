@@ -32,6 +32,6 @@
 *.app
 
 # Build
-/SPSC/build
+*/build
 
 .vscode
