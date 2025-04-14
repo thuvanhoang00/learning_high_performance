@@ -12,11 +12,11 @@ private:
     T* _ring;
     static_assert(std::atomic<std::size_t>::is_always_lock_free);
 
-    alignas(std::hardware_destructive_interference_size) std::atomic<std::size_t> _pushCursor{};
-    alignas(std::hardware_destructive_interference_size) std::atomic<std::size_t> _popCursor{};
+    alignas(64) std::atomic<std::size_t> _pushCursor{};
+    alignas(64) std::atomic<std::size_t> _popCursor{};
 
     // Padding to avoid false sharing with adjacent objects
-    char _padding[std::hardware_destructive_interference_size - sizeof(std::size_t)];
+    char _padding[64 - sizeof(std::size_t)];
 
     auto full(std::size_t pushCursor, std::size_t popCursor) const {return (pushCursor-popCursor)==_capacity;}
     static auto empty(std::size_t pushCursor, std::size_t popCursor) {return pushCursor==popCursor;}

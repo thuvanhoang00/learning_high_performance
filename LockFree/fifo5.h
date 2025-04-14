@@ -13,13 +13,13 @@ private:
     T *_ring;
     static_assert(std::atomic<std::size_t>::is_always_lock_free);
 
-    alignas(std::hardware_destructive_interference_size) std::atomic<std::size_t> _pushCursor{};
+    alignas(64) std::atomic<std::size_t> _pushCursor{};
     // Exclusive to the push thread
-    alignas(std::hardware_destructive_interference_size) std::size_t _cachedPopCursor{};
+    alignas(64) std::size_t _cachedPopCursor{};
 
-    alignas(std::hardware_destructive_interference_size) std::atomic<std::size_t> _popCursor{};
+    alignas(64) std::atomic<std::size_t> _popCursor{};
     // Exclusive to the pop thread
-    alignas(std::hardware_destructive_interference_size) std::size_t _cachedPushCursor{};
+    alignas(64) std::size_t _cachedPushCursor{};
 
     auto full(std::size_t pushCursor, std::size_t popCursor) const { return (pushCursor - popCursor) == _capacity; }
     static auto empty(std::size_t pushCursor, std::size_t popCursor) { return pushCursor == popCursor; }

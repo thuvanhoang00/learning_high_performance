@@ -25,6 +25,7 @@ static void lockfree_test(benchmark::State& s)
 
         std::thread t1(push);
         std::thread t2(pop);
+        
         t1.join();
         t2.join();
 
@@ -57,8 +58,8 @@ static void msgqueue_test(benchmark::State& s)
     size_t SIZE = 1 << s.range(0);
     for(auto state : s){
         thu::MessageQueue<int> queue;
-        thu::LockFreeQueue<int> __queue(SIZE);
-
+        Fifo4<int, std::allocator<int>> ff4(SIZE);
+        ff4.capacity();
         auto push = [&](){for(int i=0; i<SIZE; i++) queue.push(i);};
         auto pop = [&](){
             for (int i = 0; i < SIZE; i++)
@@ -177,12 +178,9 @@ static void fifo5_test(benchmark::State& s)
     }
 }
 
-BENCHMARK(fifo2_test)->DenseRange(20, 30);
-BENCHMARK(fifo3_test)->DenseRange(20, 30);
-BENCHMARK(fifo4_test)->DenseRange(20, 30);
-BENCHMARK(fifo5_test)->DenseRange(20, 30);
-
-BENCHMARK(lockfree_test)->DenseRange(20, 30);
-BENCHMARK(msgqueue_test)->DenseRange(20, 30);
-
+BENCHMARK(msgqueue_test)->DenseRange(25, 30);
+BENCHMARK(fifo2_test)->DenseRange(25, 30);
+BENCHMARK(fifo3_test)->DenseRange(25, 30);
+BENCHMARK(fifo4_test)->DenseRange(25, 30);
+BENCHMARK(fifo5_test)->DenseRange(25, 30);
 BENCHMARK_MAIN();
