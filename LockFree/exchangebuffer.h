@@ -46,8 +46,8 @@ public:
     }
 };
 
-template <typename T, uint32_t C = 4>
-bool ExchangeBuffer<T>::write(const T& value){
+template <typename T, uint32_t C>
+bool ExchangeBuffer<T, C>::write(const T& value){
 #ifdef OLD_VER
     auto copy = new (std::nothrow) T(value); // not lock-free due to default memory allocator is not
     if(copy == nullptr){
@@ -73,8 +73,8 @@ bool ExchangeBuffer<T>::write(const T& value){
     return true;
 }
 
-template <typename T, uint32_t C = 4>
-std::optional<T> ExchangeBuffer<T>::take(){
+template <typename T, uint32_t C>
+std::optional<T> ExchangeBuffer<T, C>::take(){
 #ifdef OLD_VER
     auto value = m_value.exchange(nullptr);
 
