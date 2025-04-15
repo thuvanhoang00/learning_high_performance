@@ -5,6 +5,7 @@
 #include "fifo3.h"
 #include "fifo4.h"
 #include "fifo5.h"
+#include "exchangebuffer.h"
 #include <benchmark/benchmark.h>
 
 // #define SIZE 5000000
@@ -178,9 +179,18 @@ static void fifo5_test(benchmark::State& s)
     }
 }
 
+static void exchangebuffer_bench(benchmark::State& s){
+    ExchangeBuffer<int> buffer;
+    buffer.write(100);
+    for(auto state : s){
+        buffer.write(1);
+    }
+}
+
 BENCHMARK(msgqueue_test)->DenseRange(25, 30);
 BENCHMARK(fifo2_test)->DenseRange(25, 30);
 BENCHMARK(fifo3_test)->DenseRange(25, 30);
 BENCHMARK(fifo4_test)->DenseRange(25, 30);
 BENCHMARK(fifo5_test)->DenseRange(25, 30);
+BENCHMARK(exchangebuffer_bench);
 BENCHMARK_MAIN();
