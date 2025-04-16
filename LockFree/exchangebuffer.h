@@ -21,6 +21,8 @@ private:
     indexpool_t                 m_indices;
     storage_t                   m_storage;
 
+    static_assert(std::is_trivially_copyable<T>::value);
+
 public:
     // write value, replace existinggg value if any
     // return true if successful, false otherwise
@@ -28,13 +30,13 @@ public:
 
     // write value only if buffer is empty
     // return true if successful, false otherwise
-    bool try_write(const T& value){;}
-    
+    bool try_write(const T& value);
+
     // take value from buffer (buffer is empty afterwards)
     std::optional<T> take();
 
     // read value from buffer (value will still be in the buffer)
-    std::optional<T> read(){}
+    std::optional<T> read();
 
     void free(index_t index){
         //call the destructor of T
@@ -86,8 +88,59 @@ std::optional<T> ExchangeBuffer<T, C>::take(){
 
     return std::nullopt;
 #endif
-
+    auto index = m_index.exchange(NO_DATA);
+    if(index == NO_DATA){
+        return std::nullopt;
+    }
+    auto ret = std::optional<T>(std::move(m_storage[index]));
+    free(index);
+    return ret;
 }
+
+template<typename T, uint32_t C>
+bool ExchangeBuffer<T,C>::try_write(const T& value)
+{
+    auto maybeIndex = m_indices.get();
+    if(!maybeIndex) return false;
+
+    auto index = maybeIndex.value();
+    m_storage.store_at(index, value);
+
+    index_t expected = NO_DATA;
+    if(m_index.compare_exchange_strong(expected, index)){
+        return true;
+    }
+
+    // not empty, need to free the object we stored at index
+    free(index);
+    return false;
+}
+
+
+template<typename T, uint32_t C>
+std::optional<T> ExchangeBuffer<T,C>::read(){
+#ifdef OLD_VER
+    auto index = m_index.load();
+    if(index == NO_DATA){
+        return std::nullopt;
+    }
+
+    return std::optional<T>(m_storage[index]);
+#endif
+
+    auto index = m_index.load();
+
+    while(index != NO_DATA){
+        auto ret = std::optional<T>(m_storage[index]);
+
+        if(m_index.compare_exchange_stronggg(index, index)){
+            return ret;
+        }
+    }
+
+    return std::nullopt;
+}
+
 
 template<typename T, uint32_t N, typename index_t = uint32_t>
 class Storage{
