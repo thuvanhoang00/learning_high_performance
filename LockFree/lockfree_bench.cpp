@@ -5,9 +5,9 @@
 #include "fifo3.h"
 #include "fifo4.h"
 #include "fifo5.h"
-#include "exchangebuffer.h"
+// #include "exchangebuffer.h"
 #include <benchmark/benchmark.h>
-
+#include "lockfree_queue_hft_interview.h"
 // #define SIZE 5000000
 
 static void lockfree_test(benchmark::State& s)
@@ -67,6 +67,27 @@ static void msgqueue_test(benchmark::State& s)
             {
                 int data;
                 queue.pop(data);
+            };
+        };
+        std::thread t1(push);
+        std::thread t2(pop);
+        t1.join();
+        t2.join();
+    }
+}
+
+static void lockfree_hft_test(benchmark::State& s)
+{
+    size_t SIZE = 1 << s.range(0);
+    for(auto state : s){
+        LockFreeQueue<int> queue;
+        Fifo4<int, std::allocator<int>> ff4(SIZE);
+        ff4.capacity();
+        auto push = [&](){for(int i=0; i<SIZE; i++) queue.push(i);};
+        auto pop = [&](){
+            for (int i = 0; i < SIZE; i++)
+            {
+                std::optional<int> data = queue.pop();
             };
         };
         std::thread t1(push);
@@ -179,18 +200,13 @@ static void fifo5_test(benchmark::State& s)
     }
 }
 
-static void exchangebuffer_bench(benchmark::State& s){
-    ExchangeBuffer<int> buffer;
-    buffer.write(100);
-    for(auto state : s){
-        buffer.write(1);
-    }
-}
+
 
 BENCHMARK(msgqueue_test)->DenseRange(25, 30);
-BENCHMARK(fifo2_test)->DenseRange(25, 30);
-BENCHMARK(fifo3_test)->DenseRange(25, 30);
-BENCHMARK(fifo4_test)->DenseRange(25, 30);
-BENCHMARK(fifo5_test)->DenseRange(25, 30);
-BENCHMARK(exchangebuffer_bench);
+BENCHMARK(lockfree_hft_test)->DenseRange(25, 30);
+
+// BENCHMARK(fifo2_test)->DenseRange(25, 30);
+// BENCHMARK(fifo3_test)->DenseRange(25, 30);
+// BENCHMARK(fifo4_test)->DenseRange(25, 30);
+// BENCHMARK(fifo5_test)->DenseRange(25, 30);
 BENCHMARK_MAIN();
