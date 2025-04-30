@@ -54,7 +54,7 @@ void writer(){
         int current_generation = writer_generation.fetch_add(1) + 1;
         int* old_data = shared_data.exchange(new_data);
         std::cout << "Writer updated to " << new_value << std::endl;
-        synchronize_rcu(current_generation);
+        synchronize_rcu(current_generation); // wait for "grace-period" - a time when all pre-existing readers have finished - before freeing old data
         delete old_data;
         new_value++;
         std::this_thread::sleep_for(std::chrono::seconds(1));
