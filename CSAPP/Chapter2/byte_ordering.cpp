@@ -29,5 +29,11 @@ int main()
     show_int(a);
     show_float(float(a));
     show_pointer(ptr);
+
+    std::cout << "------------\n";
+    int b = -12345; // = ~a + 1;
+    int c = -b; // = ~b + 1;
+    show_int(b);
+    show_int(c);
     return 0;
 }
