@@ -3,6 +3,7 @@
 
 /*
 *   Simple code to gain idea of STDOUT_FILENO
+*   After close STDOUT_FILENO then iostream does nothing
 */
 
 int main()
