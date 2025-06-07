@@ -1,6 +1,10 @@
 #include <iostream>
 #include <unistd.h>
 
+/*
+*   Simple using fork() API
+*   
+*/
 int main()
 {
 
