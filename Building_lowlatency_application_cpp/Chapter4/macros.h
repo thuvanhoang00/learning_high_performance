@@ -1,3 +1,6 @@
+#ifndef MACROS_H
+#define MACROS_H
+
 #include <cstring>
 #include <iostream>
 
@@ -17,3 +20,5 @@ inline auto FATAL(const std::string& msg) noexcept
     std::cerr << msg << std::endl;
     exit(EXIT_FAILURE);
 }
+
+#endif
