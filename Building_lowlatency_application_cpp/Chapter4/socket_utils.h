@@ -17,6 +17,8 @@
 #include "logging.h"
 namespace thu{
     constexpr int MaxTCPServerBacklog = 1024;
+    
+    // Basic socket API
     auto getIfaceIP(const std::string &iface) -> std::string;
     auto setNonBlocking(int fd) -> bool;
     auto setNoDelay(int fd) -> bool;
