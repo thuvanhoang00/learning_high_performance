@@ -24,7 +24,7 @@ namespace thu{
     auto setNoDelay(int fd) -> bool;
     auto setSOTimestamp(int fd) -> bool;
     auto wouldBlock() -> bool;
-    auto setMcastTTL(int fd, int ttl) -> bool;
+    auto setMcastTTL(int fd, int ttl) noexcept -> bool;
     auto setTTL(int fd, int ttl) -> bool;
     auto join(int fd, const std::string &ip, const std::string &iface, int port) -> bool;
     auto createSocket(Logger &logger, const std::string &t_ip, const std::string &iface, int port, bool is_udp, bool is_blocking,

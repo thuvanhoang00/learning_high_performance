@@ -30,7 +30,7 @@ struct TCPSocket
 
 
     auto destroy() noexcept->void;
-    auto defaultRecvCallback(TCPSocket *socket, Nanos rx_time) noexcept;
+    auto defaultRecvCallback(TCPSocket *socket, Nanos rx_time) noexcept->void;
     auto connect(const std::string &ip, const std::string &iface, int port, bool is_listening)->int;
     auto send(const void *data, size_t len) noexcept -> void;
     auto sendAndRecv() noexcept -> bool;

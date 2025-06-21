@@ -7,7 +7,7 @@ namespace thu{
         fd_ = -1;
     }
 
-    auto TCPSocket::defaultRecvCallback(TCPSocket *socket, Nanos rx_time) noexcept
+    auto TCPSocket::defaultRecvCallback(TCPSocket *socket, Nanos rx_time) noexcept->void
     {
         logger_.log("%:% %() % TCPSocket::defaultRecvCallback() socket:% len:% rx:%\n",
                     __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_), socket->fd_, socket->next_rcv_valid_index_, rx_time);

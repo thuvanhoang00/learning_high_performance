@@ -2,7 +2,7 @@
 #define TIME_UTILS_H
 #include <chrono>
 #include <ctime>
-
+#include <string>
 namespace thu{
     typedef int64_t Nanos;
     constexpr Nanos NANOS_TO_MICROS = 1000;

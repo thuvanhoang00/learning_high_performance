@@ -29,11 +29,11 @@ public:
     TCPServer& operator=(const TCPServer&) = delete;
     TCPServer& operator=(TCPServer&&) = delete;
 
-    auto defaultRecvCallback(TCPSocket *socket, Nanos rx_time) noexcept;
+    auto defaultRecvCallback(TCPSocket *socket, Nanos rx_time) noexcept->void;
     auto defaultRecvFinishedCallback() noexcept->void;
     auto destroy();
     auto listen(const std::string &iface, int port)->void;
-    auto epoll_add(TCPSocket *socket);
+    auto epoll_add(TCPSocket *socket)->bool;
     auto epoll_del(TCPSocket *socket);
     auto del(TCPSocket *socket);
     auto poll() noexcept -> void;

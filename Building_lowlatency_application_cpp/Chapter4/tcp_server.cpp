@@ -1,7 +1,7 @@
 #include "tcp_server.h"
 namespace thu
 {
-    auto TCPServer::defaultRecvCallback(TCPSocket *socket, Nanos rx_time) noexcept{
+    auto TCPServer::defaultRecvCallback(TCPSocket *socket, Nanos rx_time) noexcept->void{
         logger_.log("%:% %() %\
             TCPServer::defaultRecvCallback() socket:% len:% rx:%\n", __FILE__, __LINE__, __FUNCTION__,
             thu::getCurrentTimeStr(&time_str_), socket->fd_, socket->next_rcv_valid_index_, rx_time
@@ -32,7 +32,7 @@ namespace thu
         ASSERT(epoll_add(&listener_socket_), "epoll_add() failed. error:"+std::string(std::strerror(errno)));
     }
 
-    auto TCPServer::epoll_add(TCPSocket *socket)
+    auto TCPServer::epoll_add(TCPSocket *socket)->bool
     {
         epoll_event ev{};
         ev.events = EPOLLET | EPOLLIN;
