@@ -33,6 +33,6 @@
 *.s
 
 # Build
-*/build
+**/build
 
 .vscode
