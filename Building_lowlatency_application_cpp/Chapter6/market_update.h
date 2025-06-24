@@ -43,12 +43,12 @@ struct MEMarketUpdate{
         std::stringstream ss;
         ss << "MEMarketUpdate"
            << " ["
-           << "type:" << marketUpdateTypeToString(type_)
-           << "ticker:" << ticketIdToString(ticket_id_)
-           << "oid:" << orderIdToString(order_id_)
-           << "side:" << sideToString(side_)
-           << "qty:" << qtyToString(qty_)
-           << "price:" << priceToString(price_)
+           << "type:" << marketUpdateTypeToString(type_) << " "
+           << "ticker:" << ticketIdToString(ticket_id_) << " "
+           << "oid:" << orderIdToString(order_id_) << " "
+           << "side:" << sideToString(side_) << " "
+           << "qty:" << qtyToString(qty_) << " "
+           << "price:" << priceToString(price_) << " "
            << "priority:" << priorityToString(priority_)
            << "]";
         return ss.str();

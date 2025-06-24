@@ -46,15 +46,15 @@ struct MEClientResponse{
         std::stringstream ss;
         ss << "MEClientResponse"
            << " ["
-           << "type:" << clientResponseTypeToString(type_)
-           << "client:" << clientIdToString(client_id_)
-           << "ticker:" << ticketIdToString(ticket_id_)
-           << "coid:" << orderIdToString(client_order_id_)
-           << "moid:" << orderIdToString(market_order_id_)
-           << "side:" << sideToString(side_)
-           << "exec_qty:" << qtyToString(exec_qty_)
-           << "leaves_qty:" << qtyToString(leaves_qty_)
-           << "price:" << priceToString(price_)
+           << "type:" << clientResponseTypeToString(type_) << " "
+           << "client:" << clientIdToString(client_id_) << " "
+           << "ticker:" << ticketIdToString(ticket_id_) << " "
+           << "coid:" << orderIdToString(client_order_id_) << " "
+           << "moid:" << orderIdToString(market_order_id_) << " "
+           << "side:" << sideToString(side_) << " "
+           << "exec_qty:" << qtyToString(exec_qty_) << " "
+           << "leaves_qty:" << qtyToString(leaves_qty_) << " "
+           << "price:" << priceToString(price_) 
            << "]";
         return ss.str();
     }
