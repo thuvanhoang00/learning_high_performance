@@ -59,7 +59,7 @@ inline auto qtyToString(Qty qty)->std::string{
 // Priority
 typedef uint64_t Priority;
 constexpr auto Priority_INVALID = std::numeric_limits<Priority>::max();
-inline auto priceToString(Priority priority)->std::string{
+inline auto priorityToString(Priority priority)->std::string{
     if(UNLIKELY(priority == Priority_INVALID)){
         return "INVALID";
     }
