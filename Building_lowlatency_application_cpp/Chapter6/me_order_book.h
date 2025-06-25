@@ -1,0 +1,48 @@
+#pragma once
+#include "types.h"
+#include "memory_pool.h"
+#include "logging.h"
+#include "client_response.h"
+#include "market_update.h"
+#include "me_order.h"
+using namespace thu;
+namespace Exchange{
+class MatchingEngine;
+class MEOrderBook final{
+private:
+    TicketId ticker_id_ = TicketId_INVALID;
+    MatchingEngine *matching_engine_ = nullptr;
+    ClientOrderHashMap cid_oid_to_order_;
+    MemPool<MEOrdersAtPrice> orders_at_price_pool_;
+    MEOrdersAtPrice *bids_by_price_ = nullptr;
+    MEOrdersAtPrice *asks_by_price_ = nullptr;
+    OrdersAtPriceHashMap price_orders_at_prices_;
+    MemPool<MEOrder> order_pool_;
+    MEClientResponse client_response_;
+    MEMarketUpdate market_update_;
+    OrderId next_market_order_id_ = 1;
+    std::string time_str_;
+    Logger *logger_ = nullptr;
+public:
+    MEOrderBook(TicketId ticker_id, Logger *logger, MatchingEngine *matching_engine);
+    ~MEOrderBook();
+
+    MEOrderBook() = delete;
+    MEOrderBook(const MEOrderBook&) = delete;
+    MEOrderBook(MEOrderBook&&) = delete;
+    MEOrderBook& operator=(const MEOrderBook&) = delete;
+    MEOrderBook& operator=(MEOrderBook&&) = delete;
+private:
+    auto generateNewMarketOrderId() noexcept->OrderId{
+        return next_market_order_id_;
+    }
+    auto priceToIndex(Price price) const noexcept{
+        return (price % ME_MAX_PRICE_LEVELS);
+    }
+    auto getOrdersAtPrice(Price price) const noexcept->MEOrdersAtPrice*{
+        return price_orders_at_prices_.at(priceToIndex(price));
+    }
+};
+
+typedef std::array<MEOrderBook *, ME_MAX_TICKETS> OrderBookHashMap;
+}
