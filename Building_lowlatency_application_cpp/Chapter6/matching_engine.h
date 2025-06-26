@@ -24,6 +24,9 @@ public:
 
 private:
     auto run() noexcept;
+    auto processClientRequest(const MEClientRequest *client_request) noexcept -> void;
+    auto sendClientResponse(const MEClientResponse *client_response) noexcept -> void;
+    auto sendMarketUpdate(const MEMarketUpdate *market_update) noexcept -> void;
 private:
     OrderBookHashMap ticker_order_book_;
     ClientRequestLFQueue *incoming_requests_ = nullptr;

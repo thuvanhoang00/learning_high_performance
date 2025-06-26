@@ -49,4 +49,49 @@ auto MatchingEngine::run() noexcept
     }
     
 }
+auto MatchingEngine::processClientRequest(const MEClientRequest *client_request) noexcept -> void
+{
+    auto order_book = ticker_order_book_[client_request->client_id_];
+    switch (client_request->type_)
+    {
+    case ClientRequestType::NEW:
+    {
+        order_book->add(client_request->client_id_,
+                        client_request->order_id_,
+                        client_request->ticket_id_,
+                        client_request->side_,
+                        client_request->price_,
+                        client_request->qty_);
+    }
+    break;
+    case ClientRequestType::CANCEL:
+    {
+        order_book->cancel(client_request->client_id_,
+                           client_request->order_id_,
+                           client_request->ticket_id_);
+    }   
+    break;
+    default:
+    {
+        FATAL("Received invalid client-request-type:"+clientRequestTypeToString(client_request->type_));
+    }
+        break;
+    } 
+}
+auto MatchingEngine::sendClientResponse(const MEClientResponse *client_response) noexcept -> void
+{
+    logger_.log("%:% %() % Sending %\n",
+                __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_), client_response->toString());
+    auto next_write = outgoing_ogw_responses_->getNextToWriteTo();
+    *next_write = std::move(*client_response);
+    outgoing_ogw_responses_->updateWriteIndex();
+}
+auto MatchingEngine::sendMarketUpdate(const MEMarketUpdate *market_update) noexcept -> void
+{
+    logger_.log("%:% %() % Sending %\n",
+                __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_), market_update->toString());
+    auto next_write = outgoing_md_updates_->getNextToWriteTo();
+    *next_write = *market_update;
+    outgoing_md_updates_->updateWriteIndex();
+}
 }
