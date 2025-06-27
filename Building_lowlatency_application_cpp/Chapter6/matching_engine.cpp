@@ -33,7 +33,7 @@ auto MatchingEngine::stop() -> void
 {
     run_ = false;
 }
-auto MatchingEngine::run() noexcept
+auto MatchingEngine::run() noexcept->void
 {
     logger_.log("%:% %() %\n",
                  __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_));

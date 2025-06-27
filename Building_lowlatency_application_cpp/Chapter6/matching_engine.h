@@ -22,11 +22,12 @@ public:
     MatchingEngine& operator=(const MatchingEngine&) = delete;
     MatchingEngine& operator=(MatchingEngine&&) = delete;
 
-private:
-    auto run() noexcept;
-    auto processClientRequest(const MEClientRequest *client_request) noexcept -> void;
     auto sendClientResponse(const MEClientResponse *client_response) noexcept -> void;
     auto sendMarketUpdate(const MEMarketUpdate *market_update) noexcept -> void;
+private:
+    auto run() noexcept->void;
+    auto processClientRequest(const MEClientRequest *client_request) noexcept -> void;
+
 private:
     OrderBookHashMap ticker_order_book_;
     ClientRequestLFQueue *incoming_requests_ = nullptr;

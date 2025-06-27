@@ -42,6 +42,7 @@ private:
     auto getOrdersAtPrice(Price price) const noexcept->MEOrdersAtPrice*{
         return price_orders_at_prices_.at(priceToIndex(price));
     }
+public:
     auto add(ClientId client_id, OrderId client_order_id, TicketId ticker_id, Side side, Price price, Qty qty) noexcept -> void;
     auto getNextPriority(Price price) noexcept {
         const auto orders_at_price = getOrdersAtPrice(price);
@@ -51,6 +52,13 @@ private:
         return orders_at_price->first_me_order_->prev_order_->priority_+1;
     }
     auto addOrder(MEOrder *order) noexcept ->void;
+    auto addOrdersAtPrice(MEOrdersAtPrice *new_orders_at_price) noexcept->void;
+    auto cancel(ClientId client_id, OrderId order_id, TicketId ticker_id) noexcept -> void;
+    auto removeOrder(MEOrder *order) noexcept->void;
+    auto removeOrdersAtPrice(Side side, Price price) noexcept -> void;
+    auto checkForMatch(ClientId client_id, OrderId client_order_id, TicketId ticker_id, Side side, Price price, Qty qty, Qty new_market_order_id) noexcept -> Qty;
+    auto match(TicketId ticker_id, ClientId client_id, Side side, OrderId client_order_id, OrderId new_market_order_id, MEOrder *itr, Qty *leaves_qty) noexcept -> void;
+    auto toString(bool detailed, bool validity_check) const -> std::string;
 };
 
 typedef std::array<MEOrderBook *, ME_MAX_TICKETS> OrderBookHashMap;
