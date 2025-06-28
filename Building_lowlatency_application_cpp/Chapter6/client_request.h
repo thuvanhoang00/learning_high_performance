@@ -29,7 +29,7 @@ inline std::string clientRequestTypeToString(ClientRequestType type){
 struct MEClientRequest{
     ClientRequestType type_ = ClientRequestType::INVALID;
     ClientId client_id_ = ClientId_INVALID;
-    TicketId ticket_id_ = TicketId_INVALID;
+    TickerId ticker_id_ = TickerId_INVALID;
     OrderId order_id_ = OrderId_INVALID;
     Side side_ = Side::INVALID;
     Price price_ = Price_INVALID;
@@ -40,7 +40,7 @@ struct MEClientRequest{
            << " ["
            << "type:" << clientRequestTypeToString(type_) << " "
            << "client:" << clientIdToString(client_id_) << " "
-           << "ticker:" << ticketIdToString(ticket_id_) << " "
+           << "ticker:" << TickerIdToString(ticker_id_) << " "
            << "oid:" << orderIdToString(order_id_) << " "
            << "side:" << sideToString(side_) << " "
            << "qty:" << qtyToString(qty_) << " "

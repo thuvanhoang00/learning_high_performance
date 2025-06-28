@@ -6,7 +6,7 @@ using namespace thu;
 namespace Exchange{
 
 struct MEOrder{
-    TicketId ticket_id_ = TicketId_INVALID;
+    TickerId ticker_id_ = TickerId_INVALID;
     ClientId client_id_ = ClientId_INVALID;
     OrderId client_order_id_ = OrderId_INVALID;
     OrderId market_order_id_ = OrderId_INVALID;
@@ -18,7 +18,7 @@ struct MEOrder{
     MEOrder *next_order_ = nullptr;
     // use with Mempool
     MEOrder() = default;
-    MEOrder(TicketId ticket_id
+    MEOrder(TickerId ticker_id
         , ClientId client_id
         , OrderId client_order_id
         , OrderId market_order_id
@@ -28,7 +28,7 @@ struct MEOrder{
         , Priority priority
         , MEOrder *prev_order
         , MEOrder *next_order)
-        : ticket_id_(ticket_id)
+        : ticker_id_(ticker_id)
         , client_id_(client_id)
         , client_order_id_(client_order_id)
         , market_order_id_(market_order_id)

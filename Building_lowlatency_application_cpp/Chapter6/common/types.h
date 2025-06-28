@@ -16,14 +16,14 @@ inline auto orderIdToString(OrderId order_id)->std::string{
     return std::to_string(order_id);
 }
 
-// TicketId
-typedef uint32_t TicketId;
-constexpr auto TicketId_INVALID = std::numeric_limits<TicketId>::max();
-inline auto ticketIdToString(TicketId ticket_id)->std::string{
-    if(UNLIKELY(ticket_id == TicketId_INVALID)){
+// TickerId
+typedef uint32_t TickerId;
+constexpr auto TickerId_INVALID = std::numeric_limits<TickerId>::max();
+inline auto TickerIdToString(TickerId ticker_id)->std::string{
+    if(UNLIKELY(ticker_id == TickerId_INVALID)){
         return "INVALID";
     }
-    return std::to_string(ticket_id);
+    return std::to_string(ticker_id);
 }
 
 // ClientId

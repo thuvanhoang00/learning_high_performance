@@ -1,7 +1,7 @@
 #include "me_order_book.h"
 #include "matching_engine.h"
 namespace Exchange{
-MEOrderBook::MEOrderBook(TicketId ticker_id, MatchingEngine *matching_engine, Logger *logger)
+MEOrderBook::MEOrderBook(TickerId ticker_id, MatchingEngine *matching_engine, Logger *logger)
 : ticker_id_(ticker_id), matching_engine_(matching_engine), orders_at_price_pool_(ME_MAX_PRICE_LEVELS), order_pool_(ME_MAX_ORDER_IDS), logger_(logger)
 {
 
@@ -17,7 +17,7 @@ MEOrderBook::~MEOrderBook()
         itr.fill(nullptr);
     }
 }
-auto MEOrderBook::add(ClientId client_id, OrderId client_order_id, TicketId ticker_id, Side side, Price price, Qty qty) noexcept -> void
+auto MEOrderBook::add(ClientId client_id, OrderId client_order_id, TickerId ticker_id, Side side, Price price, Qty qty) noexcept -> void
 {
     const auto new_market_order_id = generateNewMarketOrderId();
     client_response_ = {ClientResponseType::ACCEPTED, client_id, ticker_id, client_order_id, new_market_order_id, side, price, 0, qty};
@@ -92,7 +92,7 @@ auto MEOrderBook::addOrdersAtPrice(MEOrdersAtPrice *new_orders_at_price) noexcep
         }
     }
 }
-auto MEOrderBook::cancel(ClientId client_id, OrderId order_id, TicketId ticker_id) noexcept -> void
+auto MEOrderBook::cancel(ClientId client_id, OrderId order_id, TickerId ticker_id) noexcept -> void
 {
     auto is_cancelable = (client_id < cid_oid_to_order_.size());
     MEOrder *exchange_order = nullptr;
@@ -149,7 +149,7 @@ auto MEOrderBook::removeOrdersAtPrice(Side side, Price price) noexcept -> void
     price_orders_at_prices_.at(priceToIndex(price)) = nullptr;
     orders_at_price_pool_.deallocate(orders_at_price);
 }
-auto MEOrderBook::checkForMatch(ClientId client_id, OrderId client_order_id, TicketId ticker_id, Side side, Price price, Qty qty, Qty new_market_order_id) noexcept -> Qty
+auto MEOrderBook::checkForMatch(ClientId client_id, OrderId client_order_id, TickerId ticker_id, Side side, Price price, Qty qty, Qty new_market_order_id) noexcept -> Qty
 {
     auto leaves_qty = qty;
     if(side == Side::BUY){
@@ -174,7 +174,7 @@ auto MEOrderBook::checkForMatch(ClientId client_id, OrderId client_order_id, Tic
     }
     return leaves_qty;
 }
-auto MEOrderBook::match(TicketId ticker_id, ClientId client_id, Side side, OrderId client_order_id, OrderId new_market_order_id, MEOrder *itr, Qty *leaves_qty) noexcept -> void
+auto MEOrderBook::match(TickerId ticker_id, ClientId client_id, Side side, OrderId client_order_id, OrderId new_market_order_id, MEOrder *itr, Qty *leaves_qty) noexcept -> void
 {
     const auto order = itr;
     const auto order_qty = order->qty_;
@@ -201,6 +201,73 @@ auto MEOrderBook::match(TicketId ticker_id, ClientId client_id, Side side, Order
 }
 auto MEOrderBook::toString([[maybe_unused]]bool detailed, [[maybe_unused]]bool validity_check) const -> std::string
 {
-    return std::string();
+    std::stringstream ss;
+    std::string time_str;
+
+    auto printer = [&](std::stringstream &ss, MEOrdersAtPrice *itr, Side side, Price &last_price, bool sanity_check){
+        char buf[4096];
+        Qty qty = 0;
+        size_t num_orders = 0;
+
+        for(auto o_itr = itr->first_me_order_; ; o_itr=o_itr->next_order_){
+            qty += o_itr->qty_;
+            ++num_orders;
+            if(o_itr->next_order_ == itr->first_me_order_){
+                break;
+            }
+        }
+        sprintf(buf, " <px:%3s p:%3s n:%3s> %-3s @ %-5s(%-4s)",
+                priceToString(itr->price_).c_str(), priceToString(itr->prev_entry_->price_).c_str(), priceToString(itr->next_entry_->price_).c_str(),
+                priceToString(itr->price_).c_str(), qtyToString(qty).c_str(), std::to_string(num_orders).c_str());
+        ss << buf;
+        for(auto o_itr = itr->first_me_order_ ; ; o_itr=o_itr->next_order_){
+            if(detailed){
+                sprintf(buf, "[oid:%s q:%s p:%s n:%s] ",
+                        orderIdToString(o_itr->market_order_id_).c_str(), qtyToString(o_itr->qty_).c_str(),
+                        orderIdToString(o_itr->prev_order_ ? o_itr->prev_order_->market_order_id_ : OrderId_INVALID).c_str(),
+                        orderIdToString(o_itr->next_order_ ? o_itr->next_order_->market_order_id_ : OrderId_INVALID).c_str());
+                ss << buf;
+            }
+            if(o_itr->next_order_ == itr->first_me_order_){
+                break;
+            }
+        }
+        ss << std::endl;
+
+        if(sanity_check){
+            if((side == Side::SELL && last_price >= itr->price_)
+                || (side == Side::BUY && last_price <= itr->price_)){
+                    FATAL("Bids/Asks not sorted by ascending/descending prices last:"+priceToString(last_price) + " itr:" + itr->toString());
+                }
+            last_price = itr->price_;
+        }        
+    };
+
+    ss << "Ticker:" << TickerIdToString(ticker_id_) << std::endl;
+    {
+        auto ask_itr = asks_by_price_;
+        auto last_ask_price = std::numeric_limits<Price>::min();
+        for(size_t count = 0; ask_itr; ++count){
+            ss << "ASKS L:" << count << " => ";
+            auto next_ask_itr = (ask_itr->next_entry_ == asks_by_price_ ? nullptr : ask_itr->next_entry_);
+            printer(ss, ask_itr, Side::SELL, last_ask_price, validity_check);
+            ask_itr = next_ask_itr;
+        }
+    }
+
+    ss << std::endl << "                    X" << std::endl << std::endl;
+   
+    {
+        auto bid_itr = bids_by_price_;
+        auto last_bid_price = std::numeric_limits<Price>::min();
+        for(size_t count = 0; bid_itr; ++count){
+            ss << "BIDS L:" << count << " => ";
+            auto next_bid_itr = (bid_itr->next_entry_ == bids_by_price_ ? nullptr : bid_itr->next_entry_);
+            printer(ss, bid_itr, Side::BUY, last_bid_price, validity_check);
+            bid_itr = next_bid_itr;
+        }
+    }
+
+    return ss.str();
 }
 }

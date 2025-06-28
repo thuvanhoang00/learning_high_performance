@@ -34,7 +34,7 @@ inline std::string marketUpdateTypeToString(MarketUpdateType type){
 struct MEMarketUpdate{
     MarketUpdateType type_ = MarketUpdateType::INVALID;
     OrderId order_id_ = OrderId_INVALID;
-    TicketId ticket_id_ = TicketId_INVALID;
+    TickerId ticker_id_ = TickerId_INVALID;
     Side side_ = Side::INVALID;
     Price price_ = Price_INVALID;
     Qty qty_ = Qty_INVALID;
@@ -44,7 +44,7 @@ struct MEMarketUpdate{
         ss << "MEMarketUpdate"
            << " ["
            << "type:" << marketUpdateTypeToString(type_) << " "
-           << "ticker:" << ticketIdToString(ticket_id_) << " "
+           << "ticker:" << TickerIdToString(ticker_id_) << " "
            << "oid:" << orderIdToString(order_id_) << " "
            << "side:" << sideToString(side_) << " "
            << "qty:" << qtyToString(qty_) << " "

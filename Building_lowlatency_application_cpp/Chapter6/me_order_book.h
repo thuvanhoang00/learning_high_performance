@@ -10,7 +10,7 @@ namespace Exchange{
 class MatchingEngine;
 class MEOrderBook final{
 private:
-    TicketId ticker_id_ = TicketId_INVALID;
+    TickerId ticker_id_ = TickerId_INVALID;
     MatchingEngine *matching_engine_ = nullptr;
     ClientOrderHashMap cid_oid_to_order_;
     MemPool<MEOrdersAtPrice> orders_at_price_pool_;
@@ -24,7 +24,7 @@ private:
     std::string time_str_;
     Logger *logger_ = nullptr;
 public:
-    MEOrderBook(TicketId ticker_id, MatchingEngine *matching_engine, Logger *logger);
+    MEOrderBook(TickerId ticker_id, MatchingEngine *matching_engine, Logger *logger);
     ~MEOrderBook();
 
     MEOrderBook() = delete;
@@ -43,7 +43,7 @@ private:
         return price_orders_at_prices_.at(priceToIndex(price));
     }
 public:
-    auto add(ClientId client_id, OrderId client_order_id, TicketId ticker_id, Side side, Price price, Qty qty) noexcept -> void;
+    auto add(ClientId client_id, OrderId client_order_id, TickerId ticker_id, Side side, Price price, Qty qty) noexcept -> void;
     auto getNextPriority(Price price) noexcept {
         const auto orders_at_price = getOrdersAtPrice(price);
         if(!orders_at_price){
@@ -53,11 +53,11 @@ public:
     }
     auto addOrder(MEOrder *order) noexcept ->void;
     auto addOrdersAtPrice(MEOrdersAtPrice *new_orders_at_price) noexcept->void;
-    auto cancel(ClientId client_id, OrderId order_id, TicketId ticker_id) noexcept -> void;
+    auto cancel(ClientId client_id, OrderId order_id, TickerId ticker_id) noexcept -> void;
     auto removeOrder(MEOrder *order) noexcept->void;
     auto removeOrdersAtPrice(Side side, Price price) noexcept -> void;
-    auto checkForMatch(ClientId client_id, OrderId client_order_id, TicketId ticker_id, Side side, Price price, Qty qty, Qty new_market_order_id) noexcept -> Qty;
-    auto match(TicketId ticker_id, ClientId client_id, Side side, OrderId client_order_id, OrderId new_market_order_id, MEOrder *itr, Qty *leaves_qty) noexcept -> void;
+    auto checkForMatch(ClientId client_id, OrderId client_order_id, TickerId ticker_id, Side side, Price price, Qty qty, Qty new_market_order_id) noexcept -> Qty;
+    auto match(TickerId ticker_id, ClientId client_id, Side side, OrderId client_order_id, OrderId new_market_order_id, MEOrder *itr, Qty *leaves_qty) noexcept -> void;
     auto toString(bool detailed, bool validity_check) const -> std::string;
 };
 

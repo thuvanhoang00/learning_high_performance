@@ -35,7 +35,7 @@ inline std::string clientResponseTypeToString(ClientResponseType type){
 struct MEClientResponse{
     ClientResponseType type_ = ClientResponseType::INVALID;
     ClientId client_id_ = ClientId_INVALID;
-    TicketId ticket_id_ = TicketId_INVALID;
+    TickerId ticker_id_ = TickerId_INVALID;
     OrderId client_order_id_ = OrderId_INVALID;
     OrderId market_order_id_ = OrderId_INVALID;
     Side side_ = Side::INVALID;
@@ -48,7 +48,7 @@ struct MEClientResponse{
            << " ["
            << "type:" << clientResponseTypeToString(type_) << " "
            << "client:" << clientIdToString(client_id_) << " "
-           << "ticker:" << ticketIdToString(ticket_id_) << " "
+           << "ticker:" << TickerIdToString(ticker_id_) << " "
            << "coid:" << orderIdToString(client_order_id_) << " "
            << "moid:" << orderIdToString(market_order_id_) << " "
            << "side:" << sideToString(side_) << " "

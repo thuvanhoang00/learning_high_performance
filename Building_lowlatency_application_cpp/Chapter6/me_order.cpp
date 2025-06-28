@@ -4,7 +4,7 @@ auto MEOrder::toString() const -> std::string{
     std::stringstream ss;
     ss << "MEOrder"
        << " ["
-       << "ticker:" << ticketIdToString(ticket_id_) << " "
+       << "ticker:" << TickerIdToString(ticker_id_) << " "
        << "cid:" << clientIdToString(client_id_) << " "
        << "coid:" << orderIdToString(client_order_id_) << " "
        << "moid:" << orderIdToString(market_order_id_) << " "

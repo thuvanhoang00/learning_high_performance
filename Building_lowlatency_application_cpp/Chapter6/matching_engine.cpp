@@ -58,7 +58,7 @@ auto MatchingEngine::processClientRequest(const MEClientRequest *client_request)
     {
         order_book->add(client_request->client_id_,
                         client_request->order_id_,
-                        client_request->ticket_id_,
+                        client_request->ticker_id_,
                         client_request->side_,
                         client_request->price_,
                         client_request->qty_);
@@ -68,7 +68,7 @@ auto MatchingEngine::processClientRequest(const MEClientRequest *client_request)
     {
         order_book->cancel(client_request->client_id_,
                            client_request->order_id_,
-                           client_request->ticket_id_);
+                           client_request->ticker_id_);
     }   
     break;
     default:
