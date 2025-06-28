@@ -1,12 +1,13 @@
 #pragma once
-#include "thread_utils.h"
-#include "lockfree_queue.h"
-#include "macros.h"
+#include "common/thread_utils.h"
+#include "common/lockfree_queue.h"
+#include "common/macros.h"
+#include "common/logging.h"
 #include "client_request.h"
 #include "client_response.h"
 #include "market_update.h"
 #include "me_order_book.h"
-#include "logging.h"
+
 using namespace thu;
 namespace Exchange{
 class MatchingEngine final{

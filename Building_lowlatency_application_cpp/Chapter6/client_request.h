@@ -1,7 +1,7 @@
 #pragma once
 #include <sstream>
-#include "types.h"
-#include "lockfree_queue.h"
+#include "common/types.h"
+#include "common/lockfree_queue.h"
 using namespace thu;
 namespace Exchange{
     

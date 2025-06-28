@@ -1,7 +1,7 @@
 #pragma once
-#include "types.h"
-#include "memory_pool.h"
-#include "logging.h"
+#include "common/types.h"
+#include "common/memory_pool.h"
+#include "common/logging.h"
 #include "client_response.h"
 #include "market_update.h"
 #include "me_order.h"
@@ -24,7 +24,7 @@ private:
     std::string time_str_;
     Logger *logger_ = nullptr;
 public:
-    MEOrderBook(TicketId ticker_id, Logger *logger, MatchingEngine *matching_engine);
+    MEOrderBook(TicketId ticker_id, MatchingEngine *matching_engine, Logger *logger);
     ~MEOrderBook();
 
     MEOrderBook() = delete;

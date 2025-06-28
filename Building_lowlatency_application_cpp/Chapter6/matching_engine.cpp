@@ -7,7 +7,7 @@ MatchingEngine::MatchingEngine(ClientRequestLFQueue *client_request, ClientRespo
     , logger_("exchange_matching_engine.log")
 {
     for(size_t i = 0; i < ticker_order_book_.size(); ++i){
-        ticker_order_book_[i] = new MEOrderBook(i, &logger_, this);
+        ticker_order_book_[i] = new MEOrderBook(i, this, &logger_);
     }
 }
 

@@ -1,8 +1,8 @@
 #include "me_order_book.h"
 #include "matching_engine.h"
 namespace Exchange{
-MEOrderBook::MEOrderBook(TicketId ticker_id, Logger *logger, MatchingEngine *matching_engine)
-: ticker_id_(ticker_id), logger_(logger), matching_engine_(matching_engine), orders_at_price_pool_(ME_MAX_PRICE_LEVELS), order_pool_(ME_MAX_ORDER_IDS)
+MEOrderBook::MEOrderBook(TicketId ticker_id, MatchingEngine *matching_engine, Logger *logger)
+: ticker_id_(ticker_id), matching_engine_(matching_engine), orders_at_price_pool_(ME_MAX_PRICE_LEVELS), order_pool_(ME_MAX_ORDER_IDS), logger_(logger)
 {
 
 }
@@ -199,7 +199,7 @@ auto MEOrderBook::match(TicketId ticker_id, ClientId client_id, Side side, Order
         matching_engine_->sendMarketUpdate(&market_update_);
     }
 }
-auto MEOrderBook::toString(bool detailed, bool validity_check) const -> std::string
+auto MEOrderBook::toString([[maybe_unused]]bool detailed, [[maybe_unused]]bool validity_check) const -> std::string
 {
     return std::string();
 }

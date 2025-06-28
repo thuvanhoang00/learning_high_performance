@@ -149,7 +149,7 @@ public:
     auto log(const char* s, const T& value, A... args) noexcept{
         while(*s){
             if(*s == '%'){
-                if(UNLIKELY(*(s+1) == '%s')){
+                if(UNLIKELY(*(s+1) == '%')){
                     ++s;
                 }
                 else{
@@ -165,7 +165,7 @@ public:
 
     auto log(const char *s) noexcept{
         while(*s){
-            if(*s == '%s'){
+            if(*s == '%'){
                 if(UNLIKELY(*(s+1) == '%')){
                     ++s;
                 }
