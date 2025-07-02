@@ -27,5 +27,7 @@ public:
     ~OrderServer();
     auto start() -> void;
     auto stop() -> void;
+    auto recvCallback(TCPSocket *socket, Nanos rx_time) noexcept -> void;
+    auto recvFinishedCallback() noexcept -> void;
 };
 }
