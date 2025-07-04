@@ -4,6 +4,7 @@ set(CMAKE_CXX_FLAGS "-std=c++2a -Wall -Wextra -Werror -Wpedantic")
 
 add_subdirectory(common)
 add_subdirectory(order_server)
+add_subdirectory(market_data)
 include_directories(${PROJECT_SOURCE_DIR})
 
 add_executable("exchange_example"
