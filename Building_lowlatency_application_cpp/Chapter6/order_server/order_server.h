@@ -13,7 +13,7 @@ private:
     const std::string iface_;
     const int port_ = 0;
     ClientResponseLFQueue *outgoing_responses_ = nullptr;
-    volatile bool run_ false;
+    volatile bool run_ = false;
     std::string time_str_;
     Logger logger_;
     std::array<size_t, ME_MAX_NUM_CLIENTS> cid_next_outgoing_seq_num_;
@@ -29,5 +29,6 @@ public:
     auto stop() -> void;
     auto recvCallback(TCPSocket *socket, Nanos rx_time) noexcept -> void;
     auto recvFinishedCallback() noexcept -> void;
+    auto run() -> void;
 };
 }
