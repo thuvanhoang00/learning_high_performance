@@ -18,5 +18,32 @@ private:
     };
     std::array<RecvTimeClientRequest, ME_MAX_PENDING_REQUESTS> pending_client_requests_;
     size_t pending_size_ = 0;
+public:
+    FIFOSequencer(ClientRequestLFQueue *client_requests, Logger *logger)
+        : incoming_requests_(client_requests), logger_(logger)
+        {}
+    auto addClientRequest(Nanos rx_time, const MEClientRequest &request){
+        if(pending_size_ >= pending_client_requests_.size()){
+            FATAL("Too many pending requests");
+        }
+        pending_client_requests_.at(pending_size_++) = std::move(RecvTimeClientRequest{rx_time, request});
+    }
+    auto sequenceAndPulish(){
+        if(UNLIKELY(!pending_size_)){
+            return ;
+        }
+        logger_->log("%:% %() % Processing % requests.\n",
+                __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_), pending_size_);
+        std::sort(pending_client_requests_.begin(), pending_client_requests_.begin(), + pending_size_);
+        for(size_t i=0; i<pending_size_; ++i){
+            const auto &client_request = pending_client_requests_.at(i);
+            logger_->log("%:% %() % Writing RX: % REQ:% to FIFO.\n",
+                    __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_), client_request.recv_time_, client_request.request_.toString());
+            auto next_write = incoming_requests_->getNextToWriteTo();
+            *next_write = std::move(client_request.request_);
+            incoming_requests_->updateWriteIndex();        
+        }
+        pending_size_ = 0;
+    }
 };
 }
