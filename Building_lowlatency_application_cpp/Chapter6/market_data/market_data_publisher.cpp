@@ -4,7 +4,7 @@ namespace Exchange{
         logger_.log("%:% %() % %\n",
                 __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_));
         while(run_){
-            for(auto market_update = outgoing_md_updates_->getNextToRead; outgoing_md_updates_->size() && market_update; market_update = outgoing_md_updates_->getNextToRead()){
+            for(auto market_update = outgoing_md_updates_->getNextToRead(); outgoing_md_updates_->size() && market_update; market_update = outgoing_md_updates_->getNextToRead()){
                 logger_.log("%:% %() % Sending seq:% %\n",
                             __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_), next_inc_seq_num_, market_update->toString().c_str());
                 incremental_socket_.send(&next_inc_seq_num_, sizeof(next_inc_seq_num_));
