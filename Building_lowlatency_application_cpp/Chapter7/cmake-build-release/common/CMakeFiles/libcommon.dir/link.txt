@@ -1,0 +1,2 @@
+/usr/bin/ar qc liblibcommon.a CMakeFiles/libcommon.dir/mcast_socket.o CMakeFiles/libcommon.dir/socket_utils.o CMakeFiles/libcommon.dir/tcp_server.o CMakeFiles/libcommon.dir/tcp_socket.o
+/usr/bin/ranlib liblibcommon.a
