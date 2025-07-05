@@ -23,6 +23,7 @@ namespace thu{
     auto setNonBlocking(int fd) -> bool;
     auto setNoDelay(int fd) -> bool;
     auto setSOTimestamp(int fd) -> bool;
+    auto disableNagle(int fd) -> bool; // disbale Nagle's algorithm and associated delays
     auto wouldBlock() -> bool;
     auto setMcastTTL(int fd, int ttl) noexcept -> bool;
     auto setTTL(int fd, int ttl) -> bool;

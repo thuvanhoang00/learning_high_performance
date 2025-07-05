@@ -23,12 +23,14 @@ namespace thu{
     auto setNonBlocking(int fd) -> bool;
     auto setNoDelay(int fd) -> bool;
     auto setSOTimestamp(int fd) -> bool;
+    auto disableNagle(int fd) -> bool; // disbale Nagle's algorithm and associated delays
     auto wouldBlock() -> bool;
     auto setMcastTTL(int fd, int ttl) noexcept -> bool;
     auto setTTL(int fd, int ttl) -> bool;
     auto join(int fd, const std::string &ip) -> bool;
     auto createSocket(Logger &logger, const std::string &t_ip, const std::string &iface, int port, bool is_udp, bool is_blocking,
                         bool is_listening, int ttl, bool needs_so_timestamp) -> int;
+    // Create a TCP/UDP socket to either connect to or listen for data on or listen for connections on the specified interface and IP:port information
     auto createSocket(Logger &logger, const SocketCfg &socket_cfg) -> int;
 
     struct SocketCfg{
