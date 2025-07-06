@@ -1,8 +1,8 @@
 #pragma once
 #include <functional>
-#include "common/thread_utils.h"
-#include "common/macros.h"
-#include "common/tcp_server.h"
+#include "thread_utils.h"
+#include "macros.h"
+#include "tcp_server.h"
 #include "client_request.h"
 #include "client_response.h"
 #include "fifo_sequencer.h"

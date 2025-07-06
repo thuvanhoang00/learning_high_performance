@@ -1,6 +1,6 @@
 #pragma once
-#include "common/thread_utils.h"
-#include "common/macros.h"
+#include "thread_utils.h"
+#include "macros.h"
 #include "client_request.h"
 namespace Exchange{
 constexpr size_t ME_MAX_PENDING_REQUESTS = 1024;

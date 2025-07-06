@@ -2,7 +2,7 @@
 #include <functional>
 #include "snapshot_synthesizer.h"
 #include "market_update.h"
-#include "common/thread_utils.h"
+#include "thread_utils.h"
 
 namespace Exchange{
 class MarketDataPublisher{

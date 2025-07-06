@@ -1,7 +1,7 @@
 #pragma once
 #include <array>
 #include <sstream>
-#include "common/types.h"
+#include "types.h"
 using namespace thu;
 namespace Exchange{
 

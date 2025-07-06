@@ -92,7 +92,7 @@ auto SnapshotSynthesizer::publishSnapshot() -> void
                 __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_), end_market_update.toString());
     snapshot_socket_.send(&end_market_update, sizeof(MDPMarketUpdate));
     snapshot_socket_.sendAndRecv();
-    logger_.log("%:% %() % Published snapshot of % orders. %\n",
+    logger_.log("%:% %() % Published snapshot of % orders.\n",
                 __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_), snapshot_size-1);
 }
 
@@ -117,7 +117,7 @@ auto SnapshotSynthesizer::run() -> void
              snapshot_md_updates_->size() && market_update; market_update = snapshot_md_updates_->getNextToRead())
         {
             logger_.log("%:% %() % Processing %\n",
-                        __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_), market_update->toString().c_str());
+                        __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_), market_update->toString());
             addToSnapshot(market_update);
             snapshot_md_updates_->updateReadIndex();
         }
