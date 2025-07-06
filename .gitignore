@@ -34,5 +34,7 @@
 
 # Build
 **/build
+# Build
+**/cmake-build-release
 
 .vscode
