@@ -6,7 +6,13 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 file(GLOB SOURCES "*/*.cpp")
 
 include_directories(${PROJECT_SOURCE_DIR})
-include_directories(${PROJECT_SOURCE_DIR}/..)
-message("Exchange PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR}/../common)
-
 add_library(libexchange STATIC ${SOURCES})
+
+target_include_directories(libexchange PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}/market_data
+    ${CMAKE_CURRENT_SOURCE_DIR}/order_server
+    ${CMAKE_CURRENT_SOURCE_DIR}/matcher
+)
+
+target_link_libraries(libexchange PRIVATE libcommon)
+
