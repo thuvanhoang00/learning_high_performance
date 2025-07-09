@@ -117,4 +117,45 @@ namespace Trading{
             }
         }
     }
+    auto MarketOrderBook::addOrder(MarketOrder *order) noexcept -> void
+    {
+        const auto orders_at_price = getOrdersAtPrice(order->price_);
+        if (!orders_at_price)
+        {
+            order->next_order_ = order->prev_order_ = order;
+            auto new_orders_at_price = orders_at_price_pool_.allocate(order->side_, order->price_, order, nullptr, nullptr);
+            addOrdersAtPrice(new_orders_at_price);
+        }
+        else
+        {
+            auto first_order = (orders_at_price ? orders_at_price->first_me_order_ : nullptr);
+            first_order->prev_order_->next_order_ = order;
+            order->prev_order_ = first_order->prev_order_;
+            order->next_order_ = first_order;
+            first_order->prev_order_ = order;
+        }
+        cid_oid_to_order_.at(order->client_id_).at(order->client_order_id_) = order;
+    }
+    auto MarketOrderBook::removeOrder(MarketOrder *order) noexcept -> void
+    {
+        auto orders_at_price = getOrdersAtPrice(order->price_);
+        if (order->prev_order_ == order)
+        { // only one element
+            removeOrdersAtPrice(order->side_, order->price_);
+        }
+        else
+        { // remove the link
+            const auto order_before = order->prev_order_;
+            const auto order_after = order->next_order_;
+            order_before->next_order_ = order_after;
+            order_after->prev_order_ = order_before;
+            if (orders_at_price->first_me_order_ == order)
+            {
+                orders_at_price->first_me_order_ = order_after;
+            }
+            order->prev_order_ = order->next_order_ = nullptr;
+        }
+        cid_oid_to_order_.at(order->client_id_).at(order->client_order_id_) = nullptr;
+        order_pool_.deallocate(order);
+    }
 }

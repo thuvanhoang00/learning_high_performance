@@ -25,6 +25,14 @@ public:
     auto setTradeEngine(TradeEngine *trade_engine)->void;
     auto onMarketUpdate(const Exchange::MEMarketUpdate *market_update) noexcept ->void;
     auto updateBBO(bool update_bid, bool update_ask) noexcept ->void;
+    auto priceToIndex(Price price) const noexcept{
+        return (price % ME_MAX_PRICE_LEVELS);
+    }
+    auto getOrdersAtPrice(Price price) const noexcept->MarketOrdersAtPrice*{
+        return price_orders_at_price_.at(priceToIndex(price));
+    }
+    auto addOrder(MarketOrder *order) noexcept ->void;
+    auto removeOrder(MarketOrder *order) noexcept->void;
 };
 
 typedef std::array<MarketOrderBook *, ME_MAX_TICKETS> MarketOrderBookHashMap;
