@@ -63,8 +63,7 @@ struct MarketOrdersAtPrice{
     }
 };
 
-typedef std::array<MarketOrdersAtPrice *, ME_MAX_PRICE_LEVELS> OrdersAtPriceHashMap;
-
+// represent total quantity at best bid and ask prices
 struct BBO{
     Price bid_price_ = Price_INVALID, ask_price_ = Price_INVALID;
     Qty bid_qty_ = Qty_INVALID, ask_qty_ = Qty_INVALID;
@@ -78,5 +77,8 @@ struct BBO{
         return ss.str();
     }
 };
+
+typedef std::array<MarketOrdersAtPrice *, ME_MAX_PRICE_LEVELS> OrdersAtPriceHashMap;
+typedef std::array<MarketOrder *, ME_MAX_ORDER_IDS> OrderHashMap;
 
 } // end namespace
