@@ -88,7 +88,7 @@ class PositionKeeper{
 private:
     std::string time_str_;
     Logger *logger_ = nullptr;
-    std::array<PositionInfo, ME_MAX_TICKETS> ticker_position_;
+    std::array<PositionInfo, ME_MAX_TICKERS> ticker_position_;
 public:
     PositionKeeper(Logger *logger) : logger_(logger){}
 

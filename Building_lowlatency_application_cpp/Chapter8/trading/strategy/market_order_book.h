@@ -35,5 +35,5 @@ public:
     auto removeOrder(MarketOrder *order) noexcept->void;
 };
 
-typedef std::array<MarketOrderBook *, ME_MAX_TICKETS> MarketOrderBookHashMap;
+typedef std::array<MarketOrderBook *, ME_MAX_TICKERS> MarketOrderBookHashMap;
 }// end namespace

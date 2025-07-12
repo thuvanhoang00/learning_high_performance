@@ -61,5 +61,5 @@ public:
     auto toString(bool detailed, bool validity_check) const -> std::string;
 };
 
-typedef std::array<MEOrderBook *, ME_MAX_TICKETS> OrderBookHashMap;
+typedef std::array<MEOrderBook *, ME_MAX_TICKERS> OrderBookHashMap;
 }
