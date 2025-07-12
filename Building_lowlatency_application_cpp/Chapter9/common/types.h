@@ -70,6 +70,7 @@ enum class Side : int8_t {
     INVALID = 0,
     BUY = 1,
     SELL = -1,
+    MAX = 2
 };
 inline auto sideToString(Side side)->std::string{
     switch (side)
