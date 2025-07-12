@@ -85,6 +85,13 @@ inline auto sideToString(Side side)->std::string{
     }
 }
 
+inline constexpr auto sideToIndex(Side side)noexcept{
+    return static_cast<size_t>(side) + 1;
+}
+
+inline constexpr auto sideToValue(Side side) noexcept{
+    return static_cast<int>(side);
+}
 
 // Limits and Constraints
 constexpr size_t LOG_QUEUE_SIZE = 8 * 1024 * 1024;

@@ -33,6 +33,9 @@ public:
     }
     auto addOrder(MarketOrder *order) noexcept ->void;
     auto removeOrder(MarketOrder *order) noexcept->void;
+    auto getBBO() const noexcept->const BBO*{
+        return bbo_;
+    }
 };
 
 typedef std::array<MarketOrderBook *, ME_MAX_TICKETS> MarketOrderBookHashMap;
