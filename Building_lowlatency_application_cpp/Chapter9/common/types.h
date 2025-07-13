@@ -66,12 +66,43 @@ inline auto priorityToString(Priority priority)->std::string{
     return std::to_string(priority);
 }
 
+struct RiskCfg{
+    Qty max_order_size_ = 0;
+    Qty max_position_ = 0;
+    double max_loss_ = 0;
+    auto toString() const{
+        std::stringstream ss;
+        ss << "RiskCfg{"
+           << "max-order-size:" << qtyToString(max_order_size_) << " "
+           << "max-position:" << qtyToString(max_position_) << " "
+           << "max-loss:" << max_loss_
+           << "}";
+        return ss.str();
+    }
+};
+
+struct TradeEngineCfg{
+    Qty clip_ = 0;
+    double threshold_ = 0;
+    RiskCfg risk_cfg_;
+    auto toString() const{
+        std::stringstream ss;
+        ss << "TradeEngineCfg{"
+           << "clip:" << qtyToString(clip_) << " "
+           << "threshold:" << threshold_ << " "
+           << "risk:" << risk_cfg_.toString()
+           << "}";
+        return ss.str();
+    }
+};
+
 enum class Side : int8_t {
     INVALID = 0,
     BUY = 1,
     SELL = -1,
     MAX = 2
 };
+
 inline auto sideToString(Side side)->std::string{
     switch (side)
     {
@@ -102,6 +133,8 @@ constexpr size_t ME_MAX_MARKET_UPDATES = 256 * 1024;
 constexpr size_t ME_MAX_NUM_CLIENTS = 256;
 constexpr size_t ME_MAX_ORDER_IDS = 1024 * 1024;
 constexpr size_t ME_MAX_PRICE_LEVELS = 256;
+
+typedef std::array<TradeEngineCfg, ME_MAX_TICKERS> TradeEngineCfgHashMap;
 }
 
 #endif
