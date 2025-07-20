@@ -44,12 +44,32 @@ private:
 
     MarketMaker *mm_algo_ = nullptr;
     LiquidityTaker *taker_algo_ = nullptr;
+
+    auto defaultAlgoOnOrderBookUpdate(TickerId ticker_id, Price price, Side side, MarketOrderBook *) noexcept->void{
+        logger_.log("%:% %() % ticker:% price:% side:%\n", __FILE__, __LINE__, __FUNCTION__,
+                    thu::getCurrentTimeStr(&time_str_), ticker_id, thu::priceToString(price).c_str(),
+                    thu::sideToString(side).c_str());
+    }
+    auto defaultAlgoOnTradeUpdate(const Exchange::MEMarketUpdate *market_update, MarketOrderBook *) noexcept->void{
+        logger_.log("%:% %() % %\n", __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_),
+                    market_update->toString().c_str());
+    }
+    auto defaultAlgoOnOrderUpdate(const Exchange::MEClientResponse *client_response) noexcept->void{
+        logger_.log("%:% %() % %\n", __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_),
+                    client_response->toString().c_str());
+    }
+
 public:
     TradeEngine(ClientId client_id, AlgoType type, const TradeEngineCfgHashMap &ticker_cfg
                 , Exchange::ClientRequestLFQueue *client_requests
                 , Exchange::ClientResponseLFQueue *client_responses
                 , Exchange::MEMarketUpdateLFQueue *market_updates);
     ~TradeEngine();
+    TradeEngine() = delete;
+    TradeEngine(const TradeEngine &) = delete;
+    TradeEngine& operator=(const TradeEngine&) = delete;
+    TradeEngine(TradeEngine&&) = delete;
+    TradeEngine& operator=(TradeEngine &&) = delete;
 
     auto start()->void{
         run_ = true;
@@ -71,14 +91,25 @@ public:
     }
 
     auto run() noexcept->void;
+    auto sendClientRequest(const Exchange::MEClientRequest *client_request) noexcept->void;
+    auto onOrderBookUpdate(TickerId ticker_id, Price price, Side side, MarketOrderBook *book) noexcept->void;
+    auto onTradeUpdate(const Exchange::MEMarketUpdate *market_update, MarketOrderBook *book) noexcept->void;
+    auto onOrderUpdate(const Exchange::MEClientResponse *client_response) noexcept->void;
 
+    auto initLastEventTime(){
+        last_event_time_ = getCurrentNanos();
+    }
+    auto silentSeconds(){
+        return (thu::getCurrentNanos() - last_event_time_)/NANOS_TO_SECS;
+    }
+    auto clientId() const{
+        return client_id_;
+    }
 
     std::function<void(TickerId ticker_id, Price price, Side side, MarketOrderBook *book)> algoOnOrderBookUpdate_;
     std::function<void(const Exchange::MEMarketUpdate *market_update, MarketOrderBook *book)> algoOnTradeUpdate_;
     std::function<void(const Exchange::MEClientResponse *client_response)> algoOnOrderUpdate_;
 
-    auto clientId() const{
-        return client_id_;
-    }
+
 };
 }// end namespace
