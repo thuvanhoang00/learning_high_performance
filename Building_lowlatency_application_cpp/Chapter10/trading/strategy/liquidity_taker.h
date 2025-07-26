@@ -3,9 +3,9 @@
 #include "common/logging.h"
 #include "order_manager.h"
 #include "feature_engine.h"
-#include "trade_engine.h"
 
 namespace Trading{
+class TradeEngine;
 class LiquidityTaker{
 private:
     const FeatureEngine *feature_engine_ = nullptr;

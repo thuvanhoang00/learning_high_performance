@@ -5,11 +5,9 @@
 #include "exchange/order_server/client_request.h"
 #include "om_order.h"
 #include "risk_manager.h"
-#include "trade_engine.h"
 using namespace thu;
 namespace Trading{
 class TradeEngine;
-
 class OrderManager{
 private:
     TradeEngine *trade_engine_ = nullptr;
@@ -22,6 +20,13 @@ public:
     OrderManager(Logger *logger, TradeEngine *trade_engine, RiskManager &risk_manager);
     // : trade_engine_(trade_engine), risk_manager_(risk_manager), logger_(logger)
     // {}
+    OrderManager() = delete;
+    OrderManager(const OrderManager&) = delete;
+    OrderManager& operator=(const OrderManager&) = delete;
+    OrderManager(OrderManager&&) = delete;
+    OrderManager& operator=(OrderManager&) = delete;
+
+
     auto getOMOrderSideHashMap(TickerId ticker_id) const {
         return &(ticker_side_order_.at(ticker_id));
     }

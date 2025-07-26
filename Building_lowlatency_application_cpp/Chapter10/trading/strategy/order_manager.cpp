@@ -1,4 +1,5 @@
 #include "order_manager.h"
+#include "trade_engine.h"
 namespace Trading
 {
     OrderManager::OrderManager(Logger *logger, TradeEngine *trade_engine, RiskManager &risk_manager)
