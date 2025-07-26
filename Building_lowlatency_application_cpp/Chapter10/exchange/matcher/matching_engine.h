@@ -1,11 +1,11 @@
 #pragma once
-#include "thread_utils.h"
-#include "lockfree_queue.h"
-#include "macros.h"
-#include "logging.h"
-#include "client_request.h"
-#include "client_response.h"
-#include "market_update.h"
+#include "common/thread_utils.h"
+#include "common/lockfree_queue.h"
+#include "common/macros.h"
+#include "common/logging.h"
+#include "order_server/client_request.h"
+#include "order_server/client_response.h"
+#include "market_data/market_update.h"
 #include "me_order_book.h"
 
 using namespace thu;

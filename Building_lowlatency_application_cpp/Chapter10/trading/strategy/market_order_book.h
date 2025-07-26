@@ -34,7 +34,7 @@ public:
     auto addOrder(MarketOrder *order) noexcept ->void;
     auto removeOrder(MarketOrder *order) noexcept->void;
     auto getBBO() const noexcept->const BBO*{
-        return bbo_;
+        return &bbo_;
     }
 };
 

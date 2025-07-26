@@ -2,7 +2,7 @@
 #define TYPES_H
 #include <cstdint>
 #include <limits>
-#include <stringstream>
+#include <sstream>
 #include "macros.h"
 
 namespace thu{

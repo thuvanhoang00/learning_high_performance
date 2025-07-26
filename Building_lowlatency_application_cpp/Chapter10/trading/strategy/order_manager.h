@@ -5,7 +5,7 @@
 #include "exchange/order_server/client_request.h"
 #include "om_order.h"
 #include "risk_manager.h"
-#include "trading_engine.h"
+#include "trade_engine.h"
 using namespace thu;
 namespace Trading{
 class TradeEngine;

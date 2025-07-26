@@ -4,9 +4,9 @@
 #include "common/types.h"
 #include "common/thread_utils.h"
 #include "common/lockfree_queue.h"
-#include "macros.h"
-#include "logging.h"
-#include "time_utils.h"
+#include "common/macros.h"
+#include "common/logging.h"
+#include "common/time_utils.h"
 
 #include "exchange/order_server/client_request.h"
 #include "exchange/order_server/client_response.h"
