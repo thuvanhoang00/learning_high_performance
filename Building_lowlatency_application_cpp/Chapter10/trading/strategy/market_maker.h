@@ -17,7 +17,7 @@ private:
 public:
     MarketMaker(Logger *logger, TradeEngine *trade_engine, const FeatureEngine *feature_engine
         , OrderManager *order_manager, const TradeEngineCfgHashMap &ticker_cfg)
-        : logger_(logger), feature_engine_(feature_engine), order_manager_(order_manager), ticker_cfg_(ticker_cfg)
+        : feature_engine_(feature_engine), order_manager_(order_manager), logger_(logger), ticker_cfg_(ticker_cfg)
     {
         feature_engine_->algoOnOrderBookUpdate_ = [this](auto ticker_id, auto price, auto side, auto book){
             onOrderBookUpdate(ticker_id, price, side, book);
