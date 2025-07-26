@@ -20,7 +20,7 @@ private:
     OrderId next_order_id_ = 1;
 public:
     OrderManager(Logger *logger, TradeEngine *trade_engine, RiskManager &risk_manager)
-    : logger_(logger), trade_engine_(trade_engine), risk_manager_(risk_manager)
+    : trade_engine_(trade_engine), risk_manager_(risk_manager), logger_(logger)
     {}
     auto getOMOrderSideHashMap(TickerId ticker_id) const {
         return &(ticker_side_order_.at(ticker_id));
