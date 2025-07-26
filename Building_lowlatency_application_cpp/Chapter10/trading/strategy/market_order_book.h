@@ -36,6 +36,7 @@ public:
     auto getBBO() const noexcept->const BBO*{
         return &bbo_;
     }
+    auto toString(bool detailed, bool validity_check) const ->std::string;
 };
 
 typedef std::array<MarketOrderBook *, ME_MAX_TICKERS> MarketOrderBookHashMap;

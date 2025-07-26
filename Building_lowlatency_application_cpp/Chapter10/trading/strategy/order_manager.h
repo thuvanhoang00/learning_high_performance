@@ -25,31 +25,8 @@ public:
     auto getOMOrderSideHashMap(TickerId ticker_id) const {
         return &(ticker_side_order_.at(ticker_id));
     }
-    auto newOrder(OMOrder *order, TickerId ticker_id, Price price, Side side, Qty qty) noexcept->void{
-        const Exchange::MEClientRequest new_request{Exchange::ClientRequestType::NEW
-            , trade_engine_->clientId()
-            , ticker_id
-            , next_order_id_
-            , side
-            , price
-            , qty};
-        
-        *order = {ticker_id, next_order_id_, side, price, qty, OMOrderState::PENDING_NEW};
-        ++next_order_id_;
-        logger_->log("%:% %() % Sent new order % for %\n", __FILE__, __LINE__, __FUNCTION__,
-                 thu::getCurrentTimeStr(&time_str_), new_request.toString().c_str(), order->toString().c_str());
-    }
-    auto cancelOrder(OMOrder *order) noexcept->void{
-        const Exchange::MEClientRequest cancel_request{Exchange::ClientRequestType::CANCEL, trade_engine_->clientId()
-            , order->ticker_id_
-            , order->side_
-            , order->price_
-            , order->qty_};
-        trade_engine_->sendClientRequest(&cancel_request);
-        order->order_state_ = OMOrderState::PENDING_CANCEL;
-        logger_->log("%:% %() % Sent cancel % for %\n", __FILE__, __LINE__, __FUNCTION__,
-                 thu::getCurrentTimeStr(&time_str_), cancel_request.toString().c_str(), order->toString().c_str());
-    }
+    auto newOrder(OMOrder *order, TickerId ticker_id, Price price, Side side, Qty qty) noexcept->void;
+    auto cancelOrder(OMOrder *order) noexcept->void;
     auto moveOrder(OMOrder *order, TickerId ticker_id, Price price, Side side, Qty qty) noexcept{
         switch (order->order_state_)
         {
@@ -73,7 +50,7 @@ public:
                 {
                     logger_->log("%:% %() % Ticker:% Side:% Qty:% RiskCheckResult : %\n ", __FILE__, __LINE__, __FUNCTION__,
                                  thu::getCurrentTimeStr(&time_str_),
-                                 tickerIdToString(ticker_id),
+                                 TickerIdToString(ticker_id),
                                  sideToString(side),
                                  qtyToString(qty),
                                  riskCheckResultToString(risk_result));
@@ -99,7 +76,7 @@ public:
         logger_->log("%:% %() % %\n", __FILE__, __LINE__,
                      __FUNCTION__, thu::getCurrentTimeStr(&time_str_),
                      client_response->toString().c_str());
-        auto order = &(ticker_side_order_.at(ticker_id)).at(sideToIndex(client_response->side_));
+        auto order = &(ticker_side_order_.at(client_response->ticker_id_)).at(sideToIndex(client_response->side_));
         logger_->log("%:% %() % %\n", __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_), order->toString().c_str());
         switch (client_response->type_)
         {
@@ -115,8 +92,8 @@ public:
                 order->order_state_ = OMOrderState::DEAD;
         }
             break;
-        case EXchange::ClientResponseType::CANCEL_REJECTED:
-        case EXchange::ClientResponseType::INVALID:
+        case Exchange::ClientResponseType::CANCEL_REJECTED:
+        case Exchange::ClientResponseType::INVALID:
         default:
             break;
         }

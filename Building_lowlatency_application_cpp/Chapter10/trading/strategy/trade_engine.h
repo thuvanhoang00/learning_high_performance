@@ -23,6 +23,9 @@
 
 namespace Trading{
 using namespace thu;
+class OrderManager;
+class LiquidityTaker;
+class MarketMaker;
 class TradeEngine{
 private:
     ClientId client_id_;
