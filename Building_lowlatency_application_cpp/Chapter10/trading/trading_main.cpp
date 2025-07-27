@@ -18,8 +18,14 @@ int main(int argc, char **argv){
     TradeEngineCfgHashMap ticker_cfg;
     size_t next_ticker_id = 0;
     for(int i=3; i<argc; i+=5, ++next_ticker_id){
-        ticker_cfg.at(next_ticker_id) = {static_cast<Qty>(std::atoi(argv[i]), std::atof(argv[i+1])), {static_cast<Qty>(std::atoi(argv[i+2])),
-            static_cast<Qty>(std::atoi(argv[i+3])), std::atof(argv[i+4])}};
+        ticker_cfg.at(next_ticker_id) = 
+            { static_cast<Qty>(std::atoi(argv[i]))
+            , std::atof(argv[i+1])
+            , { static_cast<Qty>(std::atoi(argv[i+2]))
+              , static_cast<Qty>(std::atoi(argv[i+3]))
+              , std::atof(argv[i+4])
+              }
+            };
     }
     logger = new Logger("trading_main_"+std::to_string(client_id) + ".log");
     const int sleep_time = 20*1000;
@@ -47,8 +53,7 @@ int main(int argc, char **argv){
     const int snapshot_port = 20000;
     const std::string incremental_ip = "233.252.14.3";
     const int incremental_port = 20001;
-    logger->log("%:% %() % Starting Market Data
-                Consumer...\n ", __FILE__, __LINE__, __FUNCTION__,
+    logger->log("%:% %() % Starting Market Data Consumer...\n ", __FILE__, __LINE__, __FUNCTION__,
                 thu::getCurrentTimeStr(&time_str));
     market_data_consumer = new Trading::MarketDataConsumer(client_id, &market_updates, mkt_data_iface, snapshot_ip, snapshot_port, incremental_ip, incremental_port);
     market_data_consumer->start();

@@ -33,6 +33,77 @@ public:
     }
     auto addOrder(MarketOrder *order) noexcept ->void;
     auto removeOrder(MarketOrder *order) noexcept->void;
+    auto addOrdersAtPrice(MarketOrdersAtPrice *new_orders_at_price) noexcept {
+      price_orders_at_price_.at(priceToIndex(new_orders_at_price->price_)) = new_orders_at_price;
+
+      const auto best_orders_by_price = (new_orders_at_price->side_ == Side::BUY ? bids_by_price_ : asks_by_price_);
+      if (UNLIKELY(!best_orders_by_price)) {
+        (new_orders_at_price->side_ == Side::BUY ? bids_by_price_ : asks_by_price_) = new_orders_at_price;
+        new_orders_at_price->prev_entry_ = new_orders_at_price->next_entry_ = new_orders_at_price;
+      } else {
+        auto target = best_orders_by_price;
+        bool add_after = ((new_orders_at_price->side_ == Side::SELL && new_orders_at_price->price_ > target->price_) ||
+                          (new_orders_at_price->side_ == Side::BUY && new_orders_at_price->price_ < target->price_));
+        if (add_after) {
+          target = target->next_entry_;
+          add_after = ((new_orders_at_price->side_ == Side::SELL && new_orders_at_price->price_ > target->price_) ||
+                       (new_orders_at_price->side_ == Side::BUY && new_orders_at_price->price_ < target->price_));
+        }
+        while (add_after && target != best_orders_by_price) {
+          add_after = ((new_orders_at_price->side_ == Side::SELL && new_orders_at_price->price_ > target->price_) ||
+                       (new_orders_at_price->side_ == Side::BUY && new_orders_at_price->price_ < target->price_));
+          if (add_after)
+            target = target->next_entry_;
+        }
+
+        if (add_after) { // add new_orders_at_price after target.
+          if (target == best_orders_by_price) {
+            target = best_orders_by_price->prev_entry_;
+          }
+          new_orders_at_price->prev_entry_ = target;
+          target->next_entry_->prev_entry_ = new_orders_at_price;
+          new_orders_at_price->next_entry_ = target->next_entry_;
+          target->next_entry_ = new_orders_at_price;
+        } else { // add new_orders_at_price before target.
+          new_orders_at_price->prev_entry_ = target->prev_entry_;
+          new_orders_at_price->next_entry_ = target;
+          target->prev_entry_->next_entry_ = new_orders_at_price;
+          target->prev_entry_ = new_orders_at_price;
+
+          if ((new_orders_at_price->side_ == Side::BUY && new_orders_at_price->price_ > best_orders_by_price->price_) ||
+              (new_orders_at_price->side_ == Side::SELL &&
+               new_orders_at_price->price_ < best_orders_by_price->price_)) {
+            target->next_entry_ = (target->next_entry_ == best_orders_by_price ? new_orders_at_price
+                                                                               : target->next_entry_);
+            (new_orders_at_price->side_ == Side::BUY ? bids_by_price_ : asks_by_price_) = new_orders_at_price;
+          }
+        }
+      }
+    }
+
+    /// Remove the MarketOrdersAtPrice from the containers - the hash map and the doubly linked list of price levels.
+    auto removeOrdersAtPrice(Side side, Price price) noexcept {
+      const auto best_orders_by_price = (side == Side::BUY ? bids_by_price_ : asks_by_price_);
+      auto orders_at_price = getOrdersAtPrice(price);
+
+      if (UNLIKELY(orders_at_price->next_entry_ == orders_at_price)) { // empty side of book.
+        (side == Side::BUY ? bids_by_price_ : asks_by_price_) = nullptr;
+      } else {
+        orders_at_price->prev_entry_->next_entry_ = orders_at_price->next_entry_;
+        orders_at_price->next_entry_->prev_entry_ = orders_at_price->prev_entry_;
+
+        if (orders_at_price == best_orders_by_price) {
+          (side == Side::BUY ? bids_by_price_ : asks_by_price_) = orders_at_price->next_entry_;
+        }
+
+        orders_at_price->prev_entry_ = orders_at_price->next_entry_ = nullptr;
+      }
+
+      price_orders_at_price_.at(priceToIndex(price)) = nullptr;
+
+      orders_at_price_pool_.deallocate(orders_at_price);
+    }
+    
     auto getBBO() const noexcept->const BBO*{
         return &bbo_;
     }

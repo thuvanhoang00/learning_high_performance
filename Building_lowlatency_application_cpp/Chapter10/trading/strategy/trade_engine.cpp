@@ -1,6 +1,6 @@
 #include "trade_engine.h"
 namespace Trading{
-    TradeEngine::TradeEngine(ClientId client_id, AlgoType type, const TradeEngineCfgHashMap &ticker_cfg, Exchange::ClientRequestLFQueue *client_requests, Exchange::ClientResponseLFQueue *client_responses, Exchange::MEMarketUpdateLFQueue *market_updates)
+    TradeEngine::TradeEngine(ClientId client_id, AlgoType algo_type, const TradeEngineCfgHashMap &ticker_cfg, Exchange::ClientRequestLFQueue *client_requests, Exchange::ClientResponseLFQueue *client_responses, Exchange::MEMarketUpdateLFQueue *market_updates)
                             : client_id_(client_id)
                             , outgoing_ogw_requests_(client_requests)
                             , incoming_ogw_responses_(client_responses)
@@ -8,7 +8,8 @@ namespace Trading{
                             , logger_("trading_engine_" + std::to_string(client_id) + ".log")
                             , feature_engine_(&logger_)
                             , position_keeper_(&logger_)
-                            , order_manager_(&logger_, this, risk_manager_)   
+                            , order_manager_(&logger_, this, risk_manager_)
+                            , risk_manager_(&logger_, &position_keeper_, ticker_cfg)  
     {
         for(size_t i = 0; i < ticker_order_book_.size(); ++i){
             ticker_order_book_[i] = new MarketOrderBook(i, &logger_);
@@ -51,7 +52,7 @@ namespace Trading{
         }
 
         outgoing_ogw_requests_ = nullptr;
-        incoming_md_updates_ = nullptr;
+        incoming_ogw_responses_ = nullptr;
         incoming_md_updates_ = nullptr;
     }
 
@@ -60,8 +61,8 @@ namespace Trading{
         logger_.log("%:% %() %\n", __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_));
         while (run_)
         {
-            for (auto client_response = incoming_md_updates_->getNextToRead();
-                 client_response; client_response = incoming_md_updates_->getNextToRead())
+            for (auto client_response = incoming_ogw_responses_->getNextToRead();
+                 client_response; client_response = incoming_ogw_responses_->getNextToRead())
             {
                 logger_.log("%:% %() % Processing %\n", __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_),
                             client_response->toString().c_str());
@@ -103,7 +104,7 @@ namespace Trading{
     }
     auto TradeEngine::onTradeUpdate(const Exchange::MEMarketUpdate *market_update, MarketOrderBook *book) noexcept -> void
     {
-        logger_.log("%:% %() % %\n", __FILE__, __LINE__, __FUNCTION__, th::getCurrentTimeStr(&time_str_),
+        logger_.log("%:% %() % %\n", __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_),
                     market_update->toString().c_str());
         feature_engine_.onTradeUpdate(market_update, book);
         algoOnTradeUpdate_(market_update, book);

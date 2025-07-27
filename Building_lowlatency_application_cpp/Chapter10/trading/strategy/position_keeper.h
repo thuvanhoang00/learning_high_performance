@@ -110,6 +110,9 @@ public:
     auto addFill(const Exchange::MEClientResponse *client_response) noexcept{
         ticker_position_.at(client_response->ticker_id_).addFill(client_response, logger_);
     }
+    auto updateBBO(TickerId ticker_id, const BBO *bbo) noexcept{
+        ticker_position_.at(ticker_id).updateBBO(bbo, logger_);
+    }
 }; // PositionKeeper
 
 } // end namespace

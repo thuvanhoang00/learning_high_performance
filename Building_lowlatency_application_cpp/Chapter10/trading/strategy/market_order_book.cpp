@@ -82,7 +82,7 @@ namespace Trading
         }
 
         updateBBO(bid_updated, ask_updated);
-        trade_engine_->onOrderBookUpdate(market_update->ticker_id_, market_update->price_, market_update->side_);
+        trade_engine_->onOrderBookUpdate(market_update->ticker_id_, market_update->price_, market_update->side_, this);
         logger_->log("%:% %() % OrderBook\n%\n", __FILE__, __LINE__, __FUNCTION__,
                      thu::getCurrentTimeStr(&time_str_), toString(false, true));
     }
@@ -123,6 +123,7 @@ namespace Trading
             }
         }
     }
+
     auto MarketOrderBook::addOrder(MarketOrder *order) noexcept -> void
     {
         const auto orders_at_price = getOrdersAtPrice(order->price_);
@@ -134,14 +135,15 @@ namespace Trading
         }
         else
         {
-            auto first_order = (orders_at_price ? orders_at_price->first_me_order_ : nullptr);
+            auto first_order = (orders_at_price ? orders_at_price->first_mkt_order_ : nullptr); // copied from git
             first_order->prev_order_->next_order_ = order;
             order->prev_order_ = first_order->prev_order_;
             order->next_order_ = first_order;
             first_order->prev_order_ = order;
         }
-        cid_oid_to_order_.at(order->client_id_).at(order->client_order_id_) = order;
+        oid_to_order_.at(order->order_id_) = order;
     }
+
     auto MarketOrderBook::removeOrder(MarketOrder *order) noexcept -> void
     {
         auto orders_at_price = getOrdersAtPrice(order->price_);
@@ -155,13 +157,13 @@ namespace Trading
             const auto order_after = order->next_order_;
             order_before->next_order_ = order_after;
             order_after->prev_order_ = order_before;
-            if (orders_at_price->first_me_order_ == order)
+            if (orders_at_price->first_mkt_order_ == order)
             {
-                orders_at_price->first_me_order_ = order_after;
+                orders_at_price->first_mkt_order_ = order_after;
             }
             order->prev_order_ = order->next_order_ = nullptr;
         }
-        cid_oid_to_order_.at(order->client_id_).at(order->client_order_id_) = nullptr;
+        oid_to_order_.at(order->order_id_) = nullptr;
         order_pool_.deallocate(order);
     }
 

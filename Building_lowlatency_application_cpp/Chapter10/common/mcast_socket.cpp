@@ -21,7 +21,7 @@ namespace thu{
     auto McastSocket::sendAndRecv() noexcept-> bool
     {
         // read data and dispatch callbacks if data is available - non blocking
-        const ssize_t n_rcv = recv(socket_fd_, inbound_data_.data()+next_rcv_valid_index_, McastBufferSize-next_rcv_valid_index_, MSG_DONTWAIT);
+        const ssize_t n_rcv = ::recv(socket_fd_, inbound_data_.data()+next_rcv_valid_index_, McastBufferSize-next_rcv_valid_index_, MSG_DONTWAIT);
         if(n_rcv > 0){
             next_rcv_valid_index_ += n_rcv;
             logger_.log("%:% %() % read socket:% len:%\n", __FILE__, __LINE__, __FUNCTION__, thu::getCurrentTimeStr(&time_str_), socket_fd_,
