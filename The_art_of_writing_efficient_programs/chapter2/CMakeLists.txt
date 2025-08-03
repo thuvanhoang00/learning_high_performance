@@ -1,0 +1,5 @@
+project(test_benchmark)
+find_package(benchmark REQUIRED)
+add_executable(${PROJECT_NAME} 10_compare_mbm.cpp)
+target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
+target_compile_options(${PROJECT_NAME} PRIVATE -O3)
