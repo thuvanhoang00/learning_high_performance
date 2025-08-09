@@ -13,7 +13,7 @@ void branch(benchmark::State& state){
     }
     unsigned long* p1 = v1.data();
     unsigned long* p2 = v2.data();
-    int* b1 = c1.data();
+    volatile int* b1 = c1.data();
     for(auto _ : state){
         unsigned long a1 = 0, a2 = 0;
         for(size_t i = 0; i<N; ++i){
