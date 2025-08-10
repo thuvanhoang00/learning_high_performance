@@ -1,0 +1,62 @@
+#include <benchmark/benchmark.h>
+#include <cstdlib>
+#include <cstddef>
+#include <string.h>
+#include <immintrin.h>
+#include <emmintrin.h>
+#define REPEAT2(x)  x x
+#define REPEAT4(x)  REPEAT2(x) REPEAT2(x)
+#define REPEAT8(x)  REPEAT4(x) REPEAT4(x)
+#define REPEAT16(x) REPEAT8(x) REPEAT8(x)
+#define REPEAT32(x) REPEAT16(x) REPEAT16(x)
+#define REPEAT(x)   REPEAT32(x)
+
+template<class Word>
+void BM_read_seq(benchmark::State& state){
+    const size_t size = state.range(0);
+    void* memory = ::malloc(size);
+    void* const end = static_cast<char*>(memory) + size;
+    volatile Word* const p0 = static_cast<Word*>(memory);
+    Word* const p1 = static_cast<Word*>(end);
+    for(auto _ : state){
+        for(volatile Word* p = p0; p != p1;){
+            REPEAT(benchmark::DoNotOptimize(*p++);)
+        }
+        benchmark::ClobberMemory();
+    }
+    ::free(memory);
+    state.SetBytesProcessed(size*state.iterations());
+    state.SetItemsProcessed((p1-p0)*state.iterations());
+}
+
+template<class Word>
+void BM_write_seq(benchmark::State& state){
+    void* memory;
+    const size_t size = state.range(0);
+    if(::posix_memalign(&memory, 64, size) != 0) abort();
+    void* const end = static_cast<char*>(memory) + size;
+    volatile Word* const p0 = static_cast<Word*>(memory);
+    Word* const p1 = static_cast<Word*>(end);
+    Word fill1;
+    ::memset(&fill1, 0xab, sizeof(fill1));
+    Word fill = fill1;
+
+    for(auto _ : state){
+        for(volatile Word* p = p0; p != p1;){
+            REPEAT(*p++ = fill;);
+        }
+        benchmark::ClobberMemory();
+    }
+    benchmark::DoNotOptimize(fill);
+    ::free(memory);
+    state.SetBytesProcessed(size*state.iterations());
+    state.SetItemsProcessed((p1-p0)*state.iterations());
+}
+
+#define ARGS ->RangeMultiplier(2)->Range(1<<10, 1<<30)
+
+BENCHMARK_TEMPLATE1(BM_read_seq, unsigned long) ARGS;
+BENCHMARK_TEMPLATE1(BM_read_seq, __m256i) ARGS;
+BENCHMARK_TEMPLATE1(BM_write_seq, unsigned long) ARGS;
+BENCHMARK_TEMPLATE1(BM_write_seq, __m256i) ARGS;
+BENCHMARK_MAIN();
