@@ -39,7 +39,7 @@ void BM_write_list(benchmark::State& state){
         benchmark::ClobberMemory();
     }
 }
-#define ARGS ->RangeMultiplier(2)->Range(1<<10, 1<<30)
+#define ARGS ->RangeMultiplier(2)->Range(1<<10, 1<<20)
 
 BENCHMARK_TEMPLATE1(BM_write_vector, unsigned long) ARGS;
 BENCHMARK_TEMPLATE1(BM_write_list, unsigned long) ARGS;

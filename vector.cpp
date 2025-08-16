@@ -1,6 +1,7 @@
 #include <memory>
 #include <vector>
 #include <iostream>
+#include <random>
 namespace thu{
 template<typename T, typename Allocator = std::allocator<T>>
 class vector{
@@ -116,6 +117,7 @@ int test_thuvector(const thu::vector<int>& vec)
 {
     long long ret{};
     for(int i=0; i<vec.size(); ++i){
+        volatile int idx = rand() % vec.size();
         ret += vec[i];
     }
     return ret;
