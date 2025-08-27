@@ -58,6 +58,7 @@ public:
 
     int size() const
     {
+        std::lock_guard<std::mutex> lock(m_);
         return data_.size();
     }
 };
