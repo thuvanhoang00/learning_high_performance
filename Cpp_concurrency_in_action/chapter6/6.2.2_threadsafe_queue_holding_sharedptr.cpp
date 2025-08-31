@@ -13,7 +13,7 @@ private:
 public:
     threadsafe_queue(){}
     void push(T new_value){
-        std::shared_ptr<T> data(std::make_shared<T>(std::move(new_value)));
+        std::shared_ptr<T> data(std::make_shared<T>(std::move(new_value))); // put outside lock() -> improve performance due to it is expensive OPs
         std::lock_guard<std::mutex> lk(mut_);
         data_queue_.push(data);
         data_cond_.notify_one();
