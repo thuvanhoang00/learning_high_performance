@@ -23,7 +23,7 @@ private:
     }
     std::unique_ptr<node> pop_head()
     {
-        std::lock_guard<std::mutex> head_lock(head_mutex_);
+        // std::lock_guard<std::mutex> head_lock(head_mutex_);
         // if(head_.get() == get_tail()){
         //     return nullptr;
         // }
