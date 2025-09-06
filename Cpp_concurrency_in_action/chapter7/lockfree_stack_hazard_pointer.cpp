@@ -1,5 +1,6 @@
 #include <atomic>
 #include <memory>
+#include "hazard_pointer.h"
 template<typename T>
 class lock_free_stack
 {
@@ -72,32 +73,35 @@ public:
         new_node->next_ = head_.load();
         while(!head_.compare_exchange_weak(new_node->next_, new_node));
     }
-    /*Leaking code and also non-exception safety*/
-    
-    // void pop(T& result)
-    // {
-    //     node* old_head = head_.load();
-    //     while(!head_.compare_exchange_weak(old_head, old_head->next_));
-    //     result = old_head->data_;
-    // }
-  
-    // std::shared_ptr<T> pop()
-    // {
-    //     node* old_head = head_.load(); // still have leaking
-    //     while(old_head && !head_.compare_exchange_weak(old_head, old_head->next_));
-    //     return old_head ? old_head->data_ : std::shared_ptr<T>(); /****** return shared_ptr wont throw an exeption  ******/
-    // }
 
     std::shared_ptr<T> pop()
     {
-        ++threads_in_pop;
+        std::atomic<void*>& hp = get_hazard_pointer_for_current_thread();
         node* old_head = head_.load();
-        while(old_head && !head_.compare_exchange_weak(old_head, old_head->next_));
+        do
+        {
+            node* temp;
+            do{
+                temp = old_head;
+                hp.store(old_head);
+                old_head = head_.load();
+            }
+            while(old_head != temp);
+        }
+        while(old_head && !head_.compare_exchange_strong(old_head, old_head->next_));
+
+        hp.store(nullptr);
         std::shared_ptr<T> res;
         if(old_head){
             res.swap(old_head->data_);
+            if(outstanding_hazard_pointers_for(old_head)){
+                reclaim_later(old_head);
+            }
+            else{
+                delete old_head;
+            }
+            delete_nodes_with_no_hazards();
         }
-        try_reclaim(old_head);
         return res;
     }
     
