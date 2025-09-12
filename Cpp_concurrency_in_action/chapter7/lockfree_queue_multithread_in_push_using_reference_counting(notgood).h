@@ -5,6 +5,13 @@ template<typename T>
 class lock_free_queue
 {
 private:
+    struct node;
+    
+    struct counted_node_ptr{
+        int external_count_;
+        node* ptr_;
+    };
+    
     struct node{
         std::shared_ptr<T> data_;
         node* next_;
@@ -46,11 +53,19 @@ public:
 
     // Multi threads in push
     void push(T new_value){
-        std::shared_ptr<T> new_data(std::make_shared<T>(new_value));
-        node* p = new node;
-        node* const old_tail = tail_.load();
-        old_tail->data_.swap(new_data);
-        old_tail->next_ = p;
-        tail_.store(p);
+        std::unique_ptr<T> new_data(new T(new_value));
+        counted_node_ptr new_next;
+        new_next.ptr_ = new node;
+        new_next.external_count_ = 1;
+        for(;;){
+            node* const old_tail = tail_.load();
+            T* old_data = nullptr;
+            if(old_tail->data_.compare_exchange_strong(old_data, new_data.get())){
+                old_tail->next_ = new_next;
+                tail_.store(new_next.ptr_);
+                new_data.release();
+                break;
+            }
+        }
     }
 };
