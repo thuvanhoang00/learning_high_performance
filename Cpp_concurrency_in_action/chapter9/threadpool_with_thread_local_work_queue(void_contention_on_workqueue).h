@@ -54,19 +54,16 @@ class thread_pool
 {
 private:
     std::atomic_bool done_;
-    threadsafe_queue<function_wrapper> work_queue_;
+    threadsafe_queue<function_wrapper> pool_work_queue_;
+    typedef std::queue<function_wrapper> local_queue_type;
+    static thread_local std::unique_ptr<local_queue_type> local_work_queue_;
     std::vector<std::thread> threads_;
     join_threads joiner_;
     void worker_thread()
     {
+        local_work_queue_.reset(new local_queue_type);
         while(!done_){
-            function_wrapper task;
-            if(work_queue_.try_pop(task)){
-                task();
-            }
-            else{
-                std::this_thread::yield();
-            }
+            run_pending_task();
         }
     }
 public:
@@ -101,13 +98,23 @@ public:
         typedef typename std::result_of<FunctionType()>::type result_type;
         std::packaged_task<result_type()> task(std::move(f));
         std::future<result_type> res(task.get_future());
-        work_queue_.push(std::move(task));
+        if(local_work_queue_){
+            local_work_queue_->push(std::move(task));
+        }
+        else{
+            pool_work_queue_.push(std::move(task));
+        }
         return res;
     }
 
     void run_pending_task(){
         function_wrapper task;
-        if(work_queue_.try_pop(task)){
+        if(local_work_queue_ && !local_work_queue_->empty()){
+            task = std::move(local_work_queue_->front());
+            local_work_queue_->pop();
+            task();
+        }
+        else if(pool_work_queue_.try_pop(task)){
             task();
         }
         else{
@@ -116,28 +123,3 @@ public:
     }
 };
 
-template<typename Iterator, typename T>
-T parallel_accumulate(Iterator first, Iterator last, T init)
-{
-    unsigned long const length = std::distance(first, last);
-    if(!length) return init;
-
-    unsigned long const block_size = 25;
-    unsigned long const num_blocks = (length+block_size-1)/block_size;
-    std::vector<std::future<T>> futures(num_blocks-1);
-    thread_pool pool;
-    Iterator block_start = first;
-    for(unsigned long i = 0; i<(num_blocks-1); ++i){
-        Iterator block_end = block_start;
-        std::advance(block_end, block_size);
-        futures[i]=pool.submit([=](){accumulate_block<Iterator, T>()(block_start, block_end);});
-        block_start = block_end;
-    }   
-    T last_result = accumulate_block<Iterator, T>(){block_start, last};
-    T result = init;
-    for(unsigned long i=0; i<(num_blocks-1); ++i){
-        result += futures[i].get();
-    }
-    result += last_result;
-    return result;
-}
