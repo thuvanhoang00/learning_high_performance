@@ -8,6 +8,7 @@ class interrupt_flag
 private:
     std::atomic<bool> flag_;
     std::condition_variable* thread_cond_;
+    std::condition_variable_any* thread_cond_any_;
     std::mutex set_clear_mutex_;
 public:
     interrupt_flag() : thread_cond_(0) {}
@@ -17,7 +18,43 @@ public:
         if(thread_cond_){
             thread_cond_->notify_all();
         }
+        else if(thread_cond_any_){
+            thread_cond_any_->notify_all();
+        }
     }
+
+    template<typename Lockable>
+    void wait(std::condition_variable_any& cv, Lockable& lk)
+    {
+        struct custom_lock{
+            interrupt_flag* self_;
+            Lockable& lk_;
+            custom_lock(interrupt_flag* self, std::condition_variable_any& cv, Lockable& lk)
+                : self_(self), lk_(lk)
+            {
+                self_->set_clear_mutex_.lock();
+                self_->thread_cond_any_ = &cv;
+            }
+            void unlock()
+            {
+                lk_.unlock();
+                self_->set_clear_mutex_.unlock();
+            }
+            void lock()
+            {
+                std::lock(self_->set_clear_mutex_, lk_);
+            }
+            ~custom_lock(){
+                self_->thread_cond_any_ = 0;
+                self_->set_clear_mutex_.unlock();
+            }
+        };
+        custom_lock cl(this, cv, lk);
+        interruption_point();
+        cv.wait(cl);
+        interruption_point();
+    }
+
     bool is_set() const{
         return flag_.load(std::memory_order_relaxed);
     }
@@ -83,7 +120,8 @@ void interruptible_wait(std::condition_variable& cv, std::unique_lock<std::mutex
 }
 
 template<typename Predicate>
-void interruptible_wait(std::contidion_variable& cv, std::unique_lock<std::mutex>& lk, Predicate pred){
+void interruptible_wait(std::contidion_variable& cv, std::unique_lock<std::mutex>& lk, Predicate pred)
+{
     interruption_point();
     this_thread_interrupt_flag.set_condition_variable(cv);
     interrupt_flag::clear_cv_on_destruct guard;
@@ -92,3 +130,21 @@ void interruptible_wait(std::contidion_variable& cv, std::unique_lock<std::mutex
     }
     interruption_point();
 }
+
+template<typename Lockable>
+void interruptible_wait(std::condition_variabale_any& cv, Lockable& lk)
+{
+    this_thread_interrupt_flag.wait(cv, lk);
+}
+
+template<typename T>
+void interruptible_wait(std::future<T>& uf)
+{
+    while(!this_thread_interrupt_flag.is_set()){
+        if(uf.wait_for(lk, std::chrono::milliseconds(1)) == std::future_status::ready){
+            break;
+        }
+    }
+    interruption_point();
+}
+//
