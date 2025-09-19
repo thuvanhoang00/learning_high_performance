@@ -16,7 +16,7 @@ int main(){
     std::deque<std::string> queue{"a", "b", "c"};
     auto s2 = authAndAccess(queue, 0);
     s2 = "b";
-
+    
     std::cout << queue[0] << std::endl;
     return 0;
 }
