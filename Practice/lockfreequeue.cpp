@@ -7,8 +7,7 @@ private:
     struct Node{
         T data_;
         Node* next_;
-        Node* prev_;
-        Node(const T& data) : data_(data), next_(nullptr), prev_(nullptr) {}
+        Node(const T& data) : data_(data), next_(nullptr) {}
     };
 
     std::atomic<Node*> head_;
@@ -19,15 +18,18 @@ public:
 
     bool push(const T& value){
         Node* new_node = new Node(value);
-
-        // append to tail
-        new_node->next_ = tail_.load();
-
-        do{
-            (*tail_).prev_ = new_node; // is it neccessary to reload on while ? -> NO ?? YES because tail_ has been changed
+        if(!tail_.load()){
+            head_ = new_node;
+            tail_ = new_node;
         }
-        while(!tail_.compare_exchange_weak(new_node->next_, new_node)); // checking tail
-
+        else{
+            Node* old = tail_.load();
+            do{
+                // append to tail
+                (*tail_).next_ = new_node;
+            }
+            while(!tail_.compare_exchange_weak(old, new_node)); // checking tail
+        }
         return true;
 
     }
@@ -39,18 +41,18 @@ public:
             return false;
         }
 
-        do{
-            popped_node->prev_ = (*head_).prev_;
-        }
+        // do{
+        //     popped_node->next_ = (*head_).next_;
+        // }
         // checking head_
-        while(!head_.compare_exchange_weak(popped_node, popped_node->prev_));
+        while(!head_.compare_exchange_weak(popped_node, popped_node->next_));
     
         value = popped_node->data_;
         return true;
     }
 };
 
-#define N 100000
+#define N 1000000
 
 int main(){
     LockFreeQueue<int> lfq;

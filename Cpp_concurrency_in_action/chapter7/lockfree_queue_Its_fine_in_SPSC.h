@@ -16,7 +16,7 @@ private:
     node* pop_head()
     {
         node* const old_head = head_.load();
-        if(old_head == tail_.load()){
+        if(old_head == tail_.load()){ // (1)
             return nullptr;
         }
         head_.store(old_head->next_);
@@ -50,6 +50,6 @@ public:
         node* const old_tail = tail_.load();
         old_tail->data_.swap(new_data);
         old_tail->next_ = p;
-        tail_.store(p);
+        tail_.store(p); // (7) synchronize with (1)
     }
 };
