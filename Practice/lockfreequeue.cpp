@@ -6,7 +6,7 @@ class LockFreeQueue{
 private:
     struct Node{
         T data_;
-        Node* next_;
+        std::atomic<Node*> next_;
         Node(const T& data) : data_(data), next_(nullptr) {}
     };
 
