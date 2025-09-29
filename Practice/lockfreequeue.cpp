@@ -19,34 +19,20 @@ public:
     bool push(const T& value){
         Node* new_node = new Node(value);
         if(!tail_.load()){
-            head_ = new_node;
-            tail_ = new_node;
+            head_.store(new_node);
         }
-        else{
-            Node* old = tail_.load();
-            do{
-                // append to tail
-                (*tail_).next_ = new_node;
-            }
-            while(!tail_.compare_exchange_weak(old, new_node)); // checking tail
-        }
+        new_node->next_ = tail_;
+        tail_.store(new_node);
         return true;
 
     }
 
     bool pop(T& value){
-        Node* popped_node = head_.load();
-
-        if(!popped_node){
+        if(!head_.load()){
             return false;
         }
-
-        // do{
-        //     popped_node->next_ = (*head_).next_;
-        // }
-        // checking head_
-        while(!head_.compare_exchange_weak(popped_node, popped_node->next_));
-    
+        auto popped_node = head_.load();
+        head_.store(popped_node->next_);
         value = popped_node->data_;
         return true;
     }
