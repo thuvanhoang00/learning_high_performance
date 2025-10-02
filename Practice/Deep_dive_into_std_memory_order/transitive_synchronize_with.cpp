@@ -43,6 +43,7 @@ void thread1(){
     sync.store(1, std::memory_order_release);
 }
 
+// immediate thread have to use acq_rel
 void thread2(){
     int expected = 1;
     while(!sync.compare_exchange_strong(expected, 2, std::memory_order_acq_rel)){
