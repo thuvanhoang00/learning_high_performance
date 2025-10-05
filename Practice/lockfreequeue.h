@@ -1,3 +1,4 @@
+#pragma once
 #include <atomic>
 #include <thread>
 #include <iostream>
@@ -57,27 +58,27 @@ public:
     }
 };
 
-#define N 100000
+// #define N 100000
 
-int main(){
-    LockFreeQueue<int> lfq;
+// int main(){
+//     LockFreeQueue<int> lfq;
 
-    std::thread t1([&](){
-        for(int i=0; i<N; ++i){
-            lfq.push(i);
-         }
-    });
+//     std::thread t1([&](){
+//         for(int i=0; i<N; ++i){
+//             lfq.push(i);
+//          }
+//     });
 
-    std::thread t2([&](){
-        for(int i=0; i<N; ++i){
-            int data;
-            lfq.pop(data);
-            std::cout << "popped: " << data << std::endl;
-        }
-    });
+//     std::thread t2([&](){
+//         for(int i=0; i<N; ++i){
+//             int data;
+//             lfq.pop(data);
+//             std::cout << "popped: " << data << std::endl;
+//         }
+//     });
 
-    t1.join();
-    t2.join();
+//     t1.join();
+//     t2.join();
 
-    return 0;
-}
+//     return 0;
+// }
