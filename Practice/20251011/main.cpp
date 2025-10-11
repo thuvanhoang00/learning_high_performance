@@ -10,15 +10,15 @@ void BM_lockfreequeue(benchmark::State& s){
         LockFreeQueue<int> lfq;
         std::jthread push([N, &lfq](){
             for(int i=0; i<N; ++i){
-                benchmark::DoNotOptimize(lfq.push(i));
+                volatile bool r = lfq.push(i);
             }
         });
-        std::jthread pop([N, &lfq](){
-            for(int i=0; i<N; ++i){
-                int v;
-                benchmark::DoNotOptimize(lfq.pop(v));
-            }
-        });
+        // std::jthread pop([N, &lfq](){
+        //     for(int i=0; i<N; ++i){
+        //         int v;
+        //         volatile bool r = lfq.pop(v);
+        //     }
+        // });
     }
     
 }
@@ -30,15 +30,15 @@ void BM_FiFo3(benchmark::State& s){
     for(auto _ : s){
         std::jthread push([N, &lfq](){
             for(int i=0; i<N; ++i){
-                benchmark::DoNotOptimize(lfq.push(i));
+                volatile bool r = lfq.push(i);
             }
         });
-        std::jthread pop([N, &lfq](){
-            for(int i=0; i<N; ++i){
-                int v;
-                benchmark::DoNotOptimize(lfq.pop(v));
-            }
-        });
+        // std::jthread pop([N, &lfq](){
+        //     for(int i=0; i<N; ++i){
+        //         int v;
+        //         volatile bool r = (lfq.pop(v));
+        //     }
+        // });
     }
 }
 
