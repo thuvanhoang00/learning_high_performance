@@ -25,7 +25,7 @@ auto getIfaceIP(const std::string& iface)->std::string;
 auto setNonBlocking(int fd)->bool;
 auto join(int fd, const std::string& ip) -> bool;
 auto createSocket(const SocketCfg& socket_cfg)->int;
-
+auto wouldBlock()->bool;
 
 
 };

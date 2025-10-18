@@ -75,4 +75,8 @@ auto createSocket(const SocketCfg& socket_cfg)->int{
 
     }
 }
+
+auto wouldBlock()->bool{
+    return errno == EWOULDBLOCK || errno == EINPROGRESS;
+}
 }
