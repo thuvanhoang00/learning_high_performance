@@ -57,7 +57,7 @@ auto TCPSocket::sendAndRecv() noexcept->bool{
         auto n_send_this_msg = std::min(static_cast<ssize_t>(next_send_valid_index_), n_send);
         const int flags = MSG_DONTWAIT | MSG_NOSIGNAL | (n_send_this_msg<n_send ? MSG_MORE : 0);
         auto n = ::send(fd_, send_buffer_, n_send_this_msg, flags);
-        if(n<0)[[unlikelly]]{
+        if(n<0)[[unlikely]]{
             if(!wouldBlock()){
                 send_disconnected_ = true;
             }
