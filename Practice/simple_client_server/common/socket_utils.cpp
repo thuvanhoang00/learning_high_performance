@@ -1,5 +1,5 @@
 #include "socket_utils.h"
-
+#include <iostream>
 // using namespace common;
 
 namespace common{
@@ -37,7 +37,9 @@ auto createSocket(const SocketCfg& socket_cfg)->int{
     const addrinfo hints(input_flags, AF_INET, socket_cfg.isUdp_ ? SOCK_DGRAM :SOCK_STREAM, socket_cfg.isUdp_ ? IPPROTO_UDP : IPPROTO_TCP, 0 , 0, nullptr, nullptr);
     
     addrinfo* result = nullptr;   
+    
     const auto rc = getaddrinfo(ip.c_str(), std::to_string(socket_cfg.port_).c_str(), &hints, &result);
+    if(!rc) std::cout << "getaddrinfo failed\n";
 
     int socket_fd = -1;
     int one = 1;
@@ -72,8 +74,9 @@ auto createSocket(const SocketCfg& socket_cfg)->int{
         if(socket_cfg.needs_so_timestamp_){
             // setSOtimestamp;
         }
-
     }
+    
+    return socket_fd;
 }
 
 auto wouldBlock()->bool{
