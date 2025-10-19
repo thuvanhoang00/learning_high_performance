@@ -11,9 +11,10 @@ struct TCPServer{
     std::vector<TCPSocket*> sockets_, receive_sockets_, send_sockets_, disconnected_sockets_;
     std::function<void(TCPSocket* s, Nanos rx_time)> recv_callback_;
     std::function<void()> recv_finished_callback_;
-    std::string time_str;
+    std::string time_str_;
+    Logger& logger_;
 
-    explicit TCPServer() : listener_socket_(){
+    explicit TCPServer(Logger& logger) : listener_socket_(logger),logger_(logger) {
         recv_callback_ = [this](auto socket, auto rx_time){
             defaultRecvCallback(socket, rx_time);
         };
@@ -24,6 +25,11 @@ struct TCPServer{
     }
 
     // Deleted constructor
+    TCPServer() = delete;
+    TCPServer(const TCPServer&) = delete;
+    TCPServer(TCPServer&&) = delete;
+    TCPServer& operator=(const TCPServer&) = delete;
+    TCPServer& operator=(TCPServer&&) = delete;
 
     auto defaultRecvCallback(TCPSocket* socket, Nanos rx_time) noexcept->void;
     auto defaultRecvFinishedCallback() noexcept->void;

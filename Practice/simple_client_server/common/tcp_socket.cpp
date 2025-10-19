@@ -8,12 +8,14 @@ auto TCPSocket::destroy() noexcept->void{
 }
 
 auto TCPSocket::defaultRecvCallback(TCPSocket* socket, Nanos rx_time) noexcept->void{
-    std::cout << __FUNCTION__ << " called\n";
+    logger_.log("%:% %() % TCPSocket::defaultRecvCallback() socket:% len:% rx:%\n",
+                __FILENAME__, __LINE__, __FUNCTION__, common::getCurrentTimeStr(&time_str_), socket->fd_, socket->next_rcv_valid_index_, rx_time);
 }
 
 auto TCPSocket::connect(const std::string& ip, const std::string& iface, int  port, bool is_listening)->int{
     destroy();
-    fd_ = createSocket({ip, iface, port, false, is_listening, true});
+    const SocketCfg socket_cfg{ip, iface, port, false, is_listening, true};
+    fd_ = createSocket(logger_, socket_cfg);
     inInAddr.sin_addr.s_addr =  INADDR_ANY;
     inInAddr.sin_port = htons(port);
     inInAddr.sin_family = AF_INET;
@@ -48,7 +50,9 @@ auto TCPSocket::sendAndRecv() noexcept->bool{
             memcpy(&time_kernel, CMSG_DATA(cmsg), sizeof(kernel_time));
             kernel_time = time_kernel.tv_sec * NANOS_TO_SECS + time_kernel.tv_usec * NANOS_TO_MICROS;
         }
-        
+        const auto user_time = getCurrentNanos();
+        logger_.log("%:% %() % read socket:% len:% utime:% ktime:% diff:%\n",
+                    __FILENAME__, __LINE__, __FUNCTION__, common::getCurrentTimeStr(&time_str_), fd_, next_rcv_valid_index_, user_time, kernel_time, (user_time - kernel_time));
         recv_callback_(this, kernel_time);
     }
 
@@ -63,7 +67,8 @@ auto TCPSocket::sendAndRecv() noexcept->bool{
             }
             break;
         }
-
+        logger_.log("%:% %() % send socket:% len:%\n",
+                    __FILENAME__, __LINE__, __FUNCTION__, common::getCurrentTimeStr(&time_str_), fd_, n);
         n_send -= n;
     }
     next_send_valid_index_ = 0;

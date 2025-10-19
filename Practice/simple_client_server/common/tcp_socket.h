@@ -1,17 +1,14 @@
 #pragma once
 #include <functional>
+#include "logging.h"
 #include "socket_utils.h"
+#include "time_utils.h"
 
 namespace common{
 constexpr size_t TCPBufferSize = 64 * 1024 * 1024;
-typedef int64_t Nanos;
-    constexpr Nanos NANOS_TO_MICROS = 1000;
-    constexpr Nanos MICROS_TO_MILLIS = 1000;
-    constexpr Nanos MILLIS_TO_SECS = 1000;
-    constexpr Nanos NANOS_TO_MILLIS = NANOS_TO_MICROS * MICROS_TO_MILLIS;
-    constexpr Nanos NANOS_TO_SECS = NANOS_TO_MILLIS * MILLIS_TO_SECS;
+
 struct TCPSocket{
-    explicit TCPSocket(){
+    explicit TCPSocket(Logger& logger) : logger_(logger) {
         send_buffer_ = new char[TCPBufferSize];
         rcv_buffer_ = new char[TCPBufferSize];
         recv_callback_ = [this](auto socket, auto rx_time){
@@ -20,7 +17,12 @@ struct TCPSocket{
     }
 
     // deleted constructor
-
+    TCPSocket() = delete;
+    TCPSocket(const TCPSocket&) = delete;
+    TCPSocket(TCPSocket&&) = delete;
+    TCPSocket& operator=(const TCPSocket&) = delete;
+    TCPSocket& operator=(TCPSocket&&) =  delete;
+    
     ~TCPSocket(){
         destroy();
         delete[] send_buffer_; send_buffer_ = nullptr;
@@ -44,5 +46,6 @@ struct TCPSocket{
     struct sockaddr_in  inInAddr;
     std::function<void(TCPSocket* s, Nanos rx_time)> recv_callback_;
     std::string time_str_;
+    Logger& logger_;
 };
 }
