@@ -14,7 +14,7 @@ Hints: avoid spawning tasks for small n (use threshold). beware std::launch::def
 Test: fib_async(30) returns 832040. Measure performance vs single-threaded.
 */
 
-#define THRESHOLD 5
+#define THRESHOLD 15
 
 int fib_single_thread(int n){
     if(n==0) return 0;
@@ -35,12 +35,26 @@ int fib_async(int n){
     return fut1.get() + fut2.get();
 }
 
+int fib_async_chatgpt(int n){
+    if(n==0) return 0;
+    if(n==1) return 1;
+    if(n==2) return 1;
+    if(n<=THRESHOLD){
+        return fib_async_chatgpt(n-1)+fib_async_chatgpt(n-2);
+    }
+    auto fut1 = std::async(std::launch::async, fib_async_chatgpt, n-1);
+    auto right = fib_async_chatgpt(n-2);
+    return fut1.get() + right;
+}
+
 void BM_fib_single_thread(benchmark::State& s){
     int N = s.range(0);
     volatile int res = 0;
     for(auto _ : s){
-        benchmark::DoNotOptimize(fib_single_thread(N));
+        res = (fib_single_thread(N));
     }
+
+    std::cout << res;
 }
 
 void BM_fib_async(benchmark::State& s){
@@ -51,6 +65,15 @@ void BM_fib_async(benchmark::State& s){
     }
 }
 
-BENCHMARK(BM_fib_async)->Arg(15);
-BENCHMARK(BM_fib_single_thread)->Arg(15);
+void BM_fib_async_chatgpt(benchmark::State& s){
+    int N = s.range(0);
+    volatile int res = 0;
+    for(auto _ : s){
+        res = fib_async_chatgpt(N);
+    }
+}
+
+BENCHMARK(BM_fib_async)->Arg(25);
+BENCHMARK(BM_fib_async_chatgpt)->Arg(25);
+BENCHMARK(BM_fib_single_thread)->Arg(25);
 BENCHMARK_MAIN();
