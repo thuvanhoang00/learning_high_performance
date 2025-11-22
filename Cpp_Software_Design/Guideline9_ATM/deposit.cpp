@@ -2,5 +2,6 @@
 #include <iostream>
 
 void Deposit::execute(){
-    std::cout << "Deposit execute\n";    
+    int amount = ui_.requestDepositAmount();
+    std::cout << "Deposit amount = " << amount  << "\n";
 }

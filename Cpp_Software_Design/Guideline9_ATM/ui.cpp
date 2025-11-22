@@ -1,13 +1,13 @@
 #include "ui.h"
 #include <iostream>
-void UI::selectMenu(){
+int UI::selectMenu(){
     std::cout << "Select Menu\n";
     std::cout << "1. Deposit\n";
     std::cout << "2. Transfer\n";
     std::cout << "3. Withdrawal\n";
     std::cout << "4. Exit\n";
 
-    size_t n;
+    int n;
     while(true){
         std::cin >> n;
         if(n<=4 && n>=1) break;
@@ -15,26 +15,34 @@ void UI::selectMenu(){
             std::cout << "Invalid input. Try again!\n";
         }
     }
+    return n;
 
-    switch (n)
-    {
-    case 1:
-        requestDepositAmount();
-        break;
-    case 2:
-        requestTransferAmount();
-        break;
-    case 3:
-        requestWithdrawalAmount();
-        break;
-    case 4:
-    default:
-        break;
-    }
+    // switch (n)
+    // {
+    // case 1:
+    //     requestDepositAmount();
+    //     break;
+    // case 2:
+    //     requestTransferAmount();
+    //     break;
+    // case 3:
+    //     requestWithdrawalAmount();
+    //     break;
+    // case 4:
+    // default:
+    //     break;
+    // }
 }
 
-void UI::requestDepositAmount(){
-    std::cout << "requestDepositAmount\n";
+int UI::requestDepositAmount(){
+    std::cout << "Enter amount: ";
+    int amount;
+    std::cin >> amount;
+    if(amount <0 ) {
+        std::cout << "Invalid amount\n";
+        return 0;
+    }
+    return amount;
 }
 
 void UI::requestTransferAmount(){

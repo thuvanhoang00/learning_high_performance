@@ -3,8 +3,8 @@
 class UI
 {
 public:
-    void selectMenu();
-    void requestDepositAmount();
+    int selectMenu();
+    int requestDepositAmount();
     void requestWithdrawalAmount();
     void requestTransferAmount();
 };
