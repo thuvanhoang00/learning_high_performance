@@ -20,6 +20,8 @@ OUTPUT:
 
 */
 
+// Kill process : kill -SIGKILL [pid]
+
 class Base{
 protected: 
     int x;
@@ -33,6 +35,10 @@ class Child : public Base{
 int main(){
     std::cout << sizeof(Base) << std::endl;
     std::cout << sizeof(Child) << std::endl;
-
+    while (true)
+    {
+      /* code */
+    }
+    
     return 0;
 }
