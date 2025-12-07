@@ -11,14 +11,11 @@ std::vector<int> makeVector(){
 int main(){
     std::vector<int> rank = makeVector();
     std::vector<int> top_ten;
+
     // this queue keep top ten value for ranking
     // greater<int> is min-queue
     std::priority_queue<int, std::vector<int>, std::greater<int>> max_queue;
-
-    // for(auto e : rank){
-    //     std::cout << e << " ";
-    // }
-
+    
     int count = 0;
     for(auto e : rank){
         if(count<10){
