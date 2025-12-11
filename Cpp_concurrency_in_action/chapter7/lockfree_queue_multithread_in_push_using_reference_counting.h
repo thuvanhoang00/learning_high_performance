@@ -25,7 +25,7 @@ private:
         // node() : next_(nullptr) {}
         std::atomic<T*> data_;
         std::atomic<node_counter> count_;
-        counted_node_ptr next_;
+        std::atomic<counted_node_ptr> next_;
         node(){
             node_counter new_count;
             new_count.internal_count = 0;
@@ -107,11 +107,11 @@ private:
     }
 
 public:
-    lock_free_queue() : head_(new node), tail_(head_.load()) {}
+    lock_free_queue() : head_(new counted_node_ptr), tail_(head_.load()) {}
     lock_free_queue(const lock_free_queue&) = delete;
-    lock_free_queue& opeartor=(const lock_free_queue&) = delete;
+    lock_free_queue& operator=(const lock_free_queue&) = delete;
     ~lock_free_queue(){
-        while(node* const old_head = head_.load()){
+        while(counted_node_ptr* const old_head = head_.load()){
             head_.store(old_head->next_);
             delete old_head;
         }
