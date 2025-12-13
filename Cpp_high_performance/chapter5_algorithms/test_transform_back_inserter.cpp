@@ -9,7 +9,7 @@ int main(){
     std::vector<int> new_vec;
 
     // if using transform with empty vector -> CRASH
-    // std::ranges::transform(new_vew, [](int i){return i*i;});
+    // std::ranges::transform(before, new_vec.begin(), [](int i){return i*i;});
     
     // use inserter instead
     std::ranges::transform(before, std::back_inserter(new_vec), [](int i){return i*i;});
