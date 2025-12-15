@@ -13,8 +13,12 @@ int main(){
     
     // use inserter instead
     std::ranges::transform(before, std::back_inserter(new_vec), [](int i){return i*i;});
+
+
     for(auto e : new_vec){
         std::cout << e << " ";
     }
+
+    std::cout << std::endl;
     return 0;
 }
