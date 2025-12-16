@@ -9,8 +9,10 @@ int main(){
     auto right = it+2;
     std::nth_element(v.begin(), left, v.end());
     std::nth_element(v.begin(), right, v.end());
+
     std::cout << *left << std::endl;
     std::cout << *right << std::endl;
+
     std::partial_sort(left, right, v.end());
     for(auto e: v){
         std::cout << e << " ";
