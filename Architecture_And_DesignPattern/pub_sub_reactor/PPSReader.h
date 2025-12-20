@@ -7,7 +7,7 @@
 #include "PPSManager.h"
 class PPSReader{
 private:
-    std::unordered_map<std::string, std::function<void(std::string received_data)>> subscribers_;
+    std::unordered_map<std::string, std::function<void(std::string)>> subscribers_;
     std::thread worker_;
     std::atomic<bool> is_running_;
 private:
