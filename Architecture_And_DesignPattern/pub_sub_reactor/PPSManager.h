@@ -2,6 +2,11 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <vector>
+
+using CallbackList = std::vector<std::function<void(std::string)>>;
+using ViewerCallback = std::function<void(std::string)>;
+
 class PPSWriter;
 class PPSReader;
 class PPSManager{
@@ -17,6 +22,6 @@ public:
     }
     void init();
     void publish(std::string obj_path, std::string msg);
-    void addViewer(std::string obj_path, std::function<void(std::string)> cb);
+    void addViewer(std::string obj_path, ViewerCallback cb);
     std::string shared_data_; 
 };

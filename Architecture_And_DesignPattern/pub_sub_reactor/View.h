@@ -3,14 +3,21 @@
 #include <string>
 #include <functional>
 #include "PPSManager.h"
-class View{
+
+class IView{
+public:
+    virtual ~IView() = 0;
+};
+
+class View1 : public IView{
 private:
 
 public:
-    View()
-    {
-        PPSManager::instance().addViewer("/pps/thuh4", [this](std::string r_data){
-            std::cout << "View receives data: " << r_data << std::endl;
-        });
+    View1() {}
+
+    ~View1() override {}
+
+    void existed_function(std::string r_data){
+        std::cout << "Call existed_function by data from Model " << r_data << std::endl;
     }
 };

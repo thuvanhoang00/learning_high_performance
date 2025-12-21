@@ -7,7 +7,7 @@
 #include "PPSManager.h"
 class PPSReader{
 private:
-    std::unordered_map<std::string, std::function<void(std::string)>> subscribers_;
+    std::unordered_map<std::string, CallbackList> subscribers_; // 1 Object - Multi Viewers
     std::thread worker_;
     std::atomic<bool> is_running_;
 private:
@@ -16,7 +16,10 @@ private:
         {
             for(auto e : subscribers_)
             {
-                e.second(PPSManager::instance().shared_data_);
+                // e.second(PPSManager::instance().shared_data_);
+                for(auto cb : e.second){
+                    cb(PPSManager::instance().shared_data_);
+                }
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
@@ -34,7 +37,7 @@ public:
             worker_.join();
         }
     }
-    void watch(std::string obj_path, std::function<void(std::string)> cb);
+    void watch(std::string obj_path, ViewerCallback cb); 
     void start();
     void stop();
 };

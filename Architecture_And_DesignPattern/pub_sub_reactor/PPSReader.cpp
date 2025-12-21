@@ -9,7 +9,7 @@ void PPSReader::stop(){
 
 }
 
-void PPSReader::watch(std::string obj_path, std::function<void(std::string)> cb)
+void PPSReader::watch(std::string obj_path, ViewerCallback cb)
 {
-    subscribers_[obj_path] = cb;
+    subscribers_[obj_path].push_back(std::move(cb));
 }
