@@ -16,7 +16,6 @@ private:
         {
             for(auto e : subscribers_)
             {
-                // e.second(PPSManager::instance().shared_data_);
                 for(auto cb : e.second){
                     cb(PPSManager::instance().shared_data_);
                 }
