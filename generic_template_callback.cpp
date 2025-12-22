@@ -2,35 +2,48 @@
 #include <unordered_map>
 #include <vector>
 #include <functional>
-
+#include <typeindex>
 
 struct Foo{
-    std::vector<std::function<void(const void*)>> cbs_;
+    std::unordered_map<std::type_index, std::vector<std::function<void(const void*)>>> cbs_;
 
+    template<typename T>
     void add_cb(std::function<void(const void*)> cb){
-        cbs_.push_back(cb);
+        cbs_[std::type_index(typeid(T))].push_back(cb);
     }
 
-    void call_cb(){
-        for(auto cb : cbs_){
-            int x = 1;
-            cb(&x);
+    template<typename T>
+    void call_cb(T data){
+        if(cbs_.find(std::type_index(typeid(T))) != cbs_.end()){
+            auto cb_list = cbs_[std::type_index(typeid(T))];
+            for(auto cb : cb_list){
+                cb(&data);
+            }
         }
     }
 };
 
+struct Bar
+{
+    char a;
+    char b;
+    double c;
+};
 
 int main(){
     Foo f;
 
-    auto int_cb = [](int x){
-        std::cout << x << std::endl;
-    };
-
-    f.add_cb([](const void* a){
-        std::cout << static_cast<const int*>(a);
+    f.add_cb<int>([](const void* a){
+        auto cast_back_to_origin_value = *(static_cast<const int*>(a));
+        std::cout << "int: " << cast_back_to_origin_value << std::endl;
     });
-    
-    f.call_cb();
+
+    f.add_cb<Bar>([](const void* arg){
+        auto origin_val = *(static_cast<const Bar*>(arg));
+        std::cout << "Bar: " << origin_val.a << ", " << origin_val.b << ", " << origin_val.c << std::endl;
+    });
+
+    f.call_cb<int>(1111);
+    f.call_cb<Bar>({'h','l',3});
     return 0;
 }
