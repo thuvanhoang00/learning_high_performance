@@ -2,6 +2,7 @@
 #include <atomic>
 #include <iostream>
 #include <thread>
+#include <vector>
 template<typename T, size_t N>
 class SPSC_LFQueue{
 private:
@@ -38,23 +39,44 @@ public:
     size_t size() const noexcept { return size_.load();}
 };
 
-SPSC_LFQueue<int, 1024> lfq;
+struct Point{
+    int x;
+    int y;
+};
+
+constexpr int N = 1440*1080*3;
+
+struct Mat{
+private:
+    std::vector<Point> data_;
+public:
+    Mat() : data_(N, {1,2}) {}
+    int sequence_id = 0;
+};
+
+SPSC_LFQueue<Mat, 10> large_lfq;
 
 int main(){
 
     auto writer = [](){
         for(int i=0; i<1024; ++i){
-            while(!lfq.push(i));
+            Mat temp;
+            temp.sequence_id=i;
+            while(!large_lfq.push(temp));
         }
     };
 
     auto reader = [](){
-        int popped_value=0;
+        Mat popped_value;
         int count=0;
-        while(lfq.pop(popped_value) && count < 1024){
-            ++count;
-            std::cout << "popped: " << popped_value << std::endl;
+        while (count < 1024)
+        {
+            if(large_lfq.pop(popped_value)){
+                ++count;
+                std::cout << "popped Mat.sequence_id: " << popped_value.sequence_id << std::endl;
+            }
         }
+
     };
 
     std::thread t1(writer);
