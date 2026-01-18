@@ -1,7 +1,7 @@
 #include <memory>
 #include <mutex>
 #include <condition_variable>
-#include <queue>
+#include <stack>
 #include <vector>
 
 template<typename T>
@@ -13,7 +13,7 @@ private:
         cv_.notify_one();
     }
 
-    std::queue<T*> pool_;
+    std::stack<T*> pool_; // cache warm 
     std::mutex mtx_;
     std::condition_variable cv_;
 public:
