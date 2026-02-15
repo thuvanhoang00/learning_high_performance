@@ -36,10 +36,6 @@ public:
         };
         std::lock_guard<std::mutex> lk(mtx_);
         auto handle = std::make_shared<InternalCallback>(std::move(wrapped));
-
-        // subscribers_[typeid(T)].push_back([callback](const void* data){
-        //     callback(*static_cast<const T*>(data));
-        // });
         subscribers_[typeid(T)].push_back(*handle);
 
         return handle;
@@ -47,8 +43,13 @@ public:
 
     template<typename T>
     void publish(const T& message){
-        auto it = subscribers_.find(typeid(T));
-        if(it != subscribers_.end()){
+        std::unordered_map<std::type_index, std::vector<InternalCallback>> snapshot;
+        {
+            std::lock_guard<std::mutex> lk(mtx_);
+            snapshot = subscribers_; // FIX re-entrancy problem
+        }
+        auto it = snapshot.find(typeid(T));
+        if(it != snapshot.end()){
             for(auto& slot : it->second){
                 slot(&message);
             }
