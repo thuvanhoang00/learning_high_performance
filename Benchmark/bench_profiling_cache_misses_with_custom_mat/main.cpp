@@ -262,6 +262,7 @@ void run_inference(SNPE& snpe, const MockMat<float>& float_frame) {
 std::atomic<bool> keep_running(true);
 std::atomic<long long> total_frames(0);
 
+
 // The Worker Function
 // We pass by value (copy) to simulate thread-local storage, 
 // but in reality, you'd likely pass a pointer to a shared buffer ring.
@@ -270,15 +271,15 @@ void worker_thread_func() {
     // 1. Name the thread for 'perf'
     // This is crucial: without this, perf report just says "adas_mock"
     pthread_setname_np(pthread_self(), "ADAS_Worker");
-    
+    // Setup Memory (Thread Local to avoid False Sharing)
+    MockMat<uint8_t> input(800, 1280, 3);
+    MockMat<uint8_t> output(640, 640, 3);
     // Initialize our mocked Neural Engine
     SNPE my_snpe_engine;
 
     // 2. The Hot Loop
     while (keep_running.load(std::memory_order_relaxed)) {
-        // Setup Memory (Thread Local to avoid False Sharing)
-        MockMat<uint8_t> input(800, 1280, 3);
-        MockMat<uint8_t> output(640, 640, 3);
+
         // Fill dummy data
         for (size_t i = 0; i < input.data.size(); ++i)
             input.data[i] = i % 255;
@@ -286,14 +287,13 @@ void worker_thread_func() {
         // Resizing
         resize_frame(input, output);
 
-        MockMat<float> float_tensor(640, 640, 3);
+        // MockMat<float> float_tensor(640, 640, 3);
 
         // Floating
-        convert_to_float_and_normalize(output, float_tensor);
-        // float_tensor = convert_to_float_normalize_and_return(output, float_tensor);
+        // convert_to_float_and_normalize(output, float_tensor);
 
         // Executing
-        run_inference(my_snpe_engine, float_tensor);
+        // run_inference(my_snpe_engine, float_tensor);
 
         // Update counter (relaxed memory order is fastest)
         total_frames.fetch_add(1, std::memory_order_relaxed);

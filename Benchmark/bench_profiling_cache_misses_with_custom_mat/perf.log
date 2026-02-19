@@ -1,0 +1,131 @@
+Resize
+✅ Finished. Total Frames: 1093
+   Average FPS: 18.2167
+
+ Performance counter stats for './Mat_bench_profile' (3 runs):
+
+          5.045,44 msec task-clock                       #    0,084 CPUs utilized               ( +-  0,45% )
+             1.834      context-switches                 #  363,497 /sec                        ( +-  2,76% )
+                 2      cpu-migrations                   #    0,396 /sec                        ( +- 28,87% )
+             2.237      page-faults                      #  443,371 /sec                      
+        27.152.164      cache-misses                                                            ( +-  0,36% )  (71,63%)
+    16.673.715.311      cycles                           #    3,305 GHz                         ( +-  0,75% )  (71,51%)
+    56.653.322.653      instructions                     #    3,40  insn per cycle              ( +-  0,12% )  (71,16%)
+     5.641.407.006      branches                         #    1,118 G/sec                       ( +-  0,12% )  (71,36%)
+         3.328.830      branch-misses                    #    0,06% of all branches             ( +-  1,27% )  (71,39%)
+     5.980.839.707      L1-dcache-loads                  #    1,185 G/sec                       ( +-  0,15% )  (71,45%)
+       193.148.297      L1-dcache-load-misses            #    3,23% of all L1-dcache accesses   ( +-  0,09% )  (71,51%)
+
+          60,01986 +- 0,00741 seconds time elapsed  ( +-  0,01% )
+       
+ ====================================================
+Resize + Floating
+ ✅ Finished. Total Frames: 1063
+   Average FPS: 17.7167
+
+ Performance counter stats for './Mat_bench_profile':
+
+          6.529,08 msec task-clock                       #    0,109 CPUs utilized             
+             2.116      context-switches                 #  324,089 /sec                      
+                 3      cpu-migrations                   #    0,459 /sec                      
+             4.639      page-faults                      #  710,514 /sec                      
+        31.531.864      cache-misses                                                            (71,37%)
+    22.450.545.130      cycles                           #    3,439 GHz                         (71,41%)
+    70.877.706.882      instructions                     #    3,16  insn per cycle              (71,50%)
+     8.113.108.587      branches                         #    1,243 G/sec                       (71,45%)
+         4.184.731      branch-misses                    #    0,05% of all branches             (71,48%)
+     9.903.786.481      L1-dcache-loads                  #    1,517 G/sec                       (71,43%)
+       374.330.068      L1-dcache-load-misses            #    3,78% of all L1-dcache accesses   (71,36%)
+
+      60,010471378 seconds time elapsed
+
+       6,466288000 seconds user
+       0,066372000 seconds sys
+       
+ ====================================================
+Resize + Floating + Executing     
+✅ Finished. Total Frames: 946
+   Average FPS: 15.7667
+
+ Performance counter stats for './Mat_bench_profile':
+
+         12.484,74 msec task-clock                       #    0,208 CPUs utilized             
+             1.192      context-switches                 #   95,477 /sec                      
+                 1      cpu-migrations                   #    0,080 /sec                      
+         2.525.631      page-faults                      #  202,297 K/sec                     
+       114.805.562      cache-misses                                                            (71,50%)
+    45.425.326.584      cycles                           #    3,638 GHz                         (71,41%)
+    80.101.678.938      instructions                     #    1,76  insn per cycle              (71,34%)
+    10.728.079.836      branches                         #  859,295 M/sec                       (71,39%)
+       383.334.171      branch-misses                    #    3,57% of all branches             (71,46%)
+    15.992.221.435      L1-dcache-loads                  #    1,281 G/sec                       (71,42%)
+       676.465.869      L1-dcache-load-misses            #    4,23% of all L1-dcache accesses   (71,49%)
+
+      60,042896134 seconds time elapsed
+
+       5,864846000 seconds user
+       6,635140000 seconds sys
+====================================================
+Resize + Floating return
+✅ Finished. Total Frames: 953
+   Average FPS: 15.8833
+
+ Performance counter stats for './Mat_bench_profile':
+
+         12.035,12 msec task-clock                       #    0,200 CPUs utilized             
+             2.751      context-switches                 #  228,581 /sec                      
+                 3      cpu-migrations                   #    0,249 /sec                      
+         2.544.307      page-faults                      #  211,407 K/sec                     
+       119.862.937      cache-misses                                                            (71,41%)
+    44.174.814.369      cycles                           #    3,670 GHz                         (71,46%)
+    79.955.225.685      instructions                     #    1,81  insn per cycle              (71,48%)
+    10.676.875.081      branches                         #  887,143 M/sec                       (71,46%)
+       386.364.385      branch-misses                    #    3,62% of all branches             (71,43%)
+    16.358.073.991      L1-dcache-loads                  #    1,359 G/sec                       (71,36%)
+       671.390.098      L1-dcache-load-misses            #    4,10% of all L1-dcache accesses   (71,39%)
+
+      60,028092597 seconds time elapsed
+
+       5,310254000 seconds user
+       6,721663000 seconds sys
+
+====================================================
+Resize(move input outside while loop)
+✅ Finished. Total Frames: 1099
+   Average FPS: 18.3167
+
+ Performance counter stats for './Mat_bench_profile' (3 runs):
+
+          4.759,86 msec task-clock                       #    0,079 CPUs utilized               ( +-  1,36% )
+             1.595      context-switches                 #  335,094 /sec                        ( +- 13,47% )
+                 1      cpu-migrations                   #    0,210 /sec                        ( +- 33,33% )
+             1.487      page-faults                      #  312,404 /sec                      
+        15.965.773      cache-misses                                                            ( +-  3,63% )  (71,43%)
+    15.480.775.557      cycles                           #    3,252 GHz                         ( +-  1,53% )  (71,33%)
+    68.332.631.407      instructions                     #    4,41  insn per cycle              ( +-  0,10% )  (71,45%)
+     6.092.060.416      branches                         #    1,280 G/sec                       ( +-  0,09% )  (71,54%)
+         3.084.874      branch-misses                    #    0,05% of all branches             ( +-  2,25% )  (71,54%)
+    13.399.694.751      L1-dcache-loads                  #    2,815 G/sec                       ( +-  0,15% )  (71,33%)
+       141.244.782      L1-dcache-load-misses            #    1,05% of all L1-dcache accesses   ( +-  0,13% )  (71,39%)
+
+          60,04534 +- 0,00801 seconds time elapsed  ( +-  0,01% )
+
+Resize(move both input+output outside while loop)
+✅ Finished. Total Frames: 1100
+   Average FPS: 18.3333
+
+ Performance counter stats for './Mat_bench_profile' (3 runs):
+
+          4.825,33 msec task-clock                       #    0,080 CPUs utilized               ( +-  0,87% )
+             1.858      context-switches                 #  385,051 /sec                        ( +-  1,12% )
+                 1      cpu-migrations                   #    0,207 /sec                        ( +- 57,74% )
+             1.186      page-faults                      #  245,786 /sec                        ( +-  0,03% )
+        10.875.489      cache-misses                                                            ( +-  1,10% )  (71,55%)
+    16.020.112.399      cycles                           #    3,320 GHz                         ( +-  1,43% )  (71,40%)
+    68.192.382.630      instructions                     #    4,26  insn per cycle              ( +-  0,08% )  (71,33%)
+     6.067.711.466      branches                         #    1,257 G/sec                       ( +-  0,10% )  (71,53%)
+         3.089.079      branch-misses                    #    0,05% of all branches             ( +-  0,61% )  (71,51%)
+    13.756.974.028      L1-dcache-loads                  #    2,851 G/sec                       ( +-  0,13% )  (71,31%)
+       119.841.583      L1-dcache-load-misses            #    0,87% of all L1-dcache accesses   ( +-  0,17% )  (71,36%)
+
+          60,04814 +- 0,00141 seconds time elapsed  ( +-  0,00% )

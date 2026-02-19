@@ -53,6 +53,7 @@ perf stat \
   -e task-clock,context-switches,cpu-migrations,page-faults,cache-misses \
   -e cycles,instructions,branches,branch-misses \
   -e L1-dcache-loads,L1-dcache-load-misses \
+  -r 3 \
    ./$EXECUTABLE_NAME
 
 echo "✅ Done."
